@@ -50,7 +50,7 @@ Once connected to any MCP-compatible AI assistant, you can ask questions about A
 
 ## API Key
 
-An API key is required. Register one at [keys.api.data.amsterdam.nl](https://keys.api.data.amsterdam.nl/clients/v1/) and add it as `AMSTERDAM_API_KEY` in your environment or via the `.mcpb` installer prompt.
+An API key is required — it's free and takes about a minute to register. Get one at [keys.api.data.amsterdam.nl](https://keys.api.data.amsterdam.nl/clients/v1/) and add it as `AMSTERDAM_API_KEY` in your environment or via the `.mcpb` installer prompt.
 
 ## Packages
 
