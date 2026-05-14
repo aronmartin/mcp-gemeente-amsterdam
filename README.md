@@ -56,7 +56,7 @@ Add to `~/Library/Application Support/Claude/claude_desktop_config.json`:
       "command": "node",
       "args": ["/path/to/mcp-gemeente-amsterdam/apps/server/dist/index.js"],
       "env": {
-        "AMSTERDAM_API_KEY": "optional"
+        "AMSTERDAM_API_KEY": "your-api-key"
       }
     }
   }
