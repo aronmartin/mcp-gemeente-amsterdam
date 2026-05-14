@@ -31,6 +31,15 @@ export function listTool(opts: {
         page: { type: "number", description: "Paginanummer (standaard 1)" },
         page_size: { type: "number", description: "Resultaten per pagina (standaard 20, max 1000)" },
         _sort: { type: "string", description: "Sorteerveld, prefix met - voor aflopend" },
+        detail: {
+          type: "string",
+          enum: ["minimal", "default", "full"],
+          description: "Responsprofiel: minimal=kernvelden, default=standaard (aanbevolen), full=alles inclusief geometrie. Gebruik full alleen als geometrie of alle velden expliciet nodig zijn.",
+        },
+        fields: {
+          type: "string",
+          description: "Komma-gescheiden extra velden of overschrijvingen, bv. 'geometrie,_links.betreftBagPand'. Wint altijd van detail.",
+        },
         ...opts.extraProps,
       },
       required: opts.required ?? ([] as const),

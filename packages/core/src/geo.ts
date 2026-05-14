@@ -90,9 +90,9 @@ export function applyNearFilter<T extends Record<string, unknown>>(
 }
 
 export const nearRadiusProps = {
-  nearLat: { type: "number", description: "WGS84 latitude van het zoekpunt voor locatiefilter" },
-  nearLon: { type: "number", description: "WGS84 longitude van het zoekpunt voor locatiefilter" },
-  radiusMeters: { type: "number", description: "Zoekradius in meters (standaard 500)" },
+  nearLat: { type: "number", description: "WGS84 latitude van het zoekpunt. Gebruik samen met nearLon + radiusMeters voor locatievragen — dit stuurt een server-side bbox-filter naar de API waardoor alleen relevante items worden opgehaald. Veel efficiënter dan ongefilterde paginatie." },
+  nearLon: { type: "number", description: "WGS84 longitude van het zoekpunt. Vereist samen met nearLat." },
+  radiusMeters: { type: "number", description: "Zoekradius in meters rondom nearLat/nearLon (standaard 500). Resultaten worden gesorteerd op afstand oplopend en krijgen _distanceMeters mee." },
 } as const;
 
 /**
