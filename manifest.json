@@ -1,0 +1,37 @@
+{
+  "manifest_version": "0.3",
+  "name": "mcp-gemeente-amsterdam",
+  "display_name": "Gemeente Amsterdam",
+  "version": "0.1.0",
+  "description": "Toegang tot alle publieke APIs van Gemeente Amsterdam: gebouwen, gebieden, verkeer, afval, erfgoed, vergunningen en meer.",
+  "author": {
+    "name": "Aron Martin"
+  },
+  "repository": { "type": "git", "url": "https://github.com/aronmartin/mcp-gemeente-amsterdam" },
+  "server": {
+    "type": "node",
+    "entry_point": "dist/ncc/index.js",
+    "mcp_config": {
+      "command": "node",
+      "args": ["${__dirname}/dist/ncc/index.js"],
+      "env": {
+        "AMSTERDAM_API_KEY": "${user_config.amsterdam_api_key}"
+      }
+    }
+  },
+  "user_config": {
+    "amsterdam_api_key": {
+      "type": "string",
+      "title": "Amsterdam API Key",
+      "description": "Optionele API key voor api.data.amsterdam.nl. Aan te vragen via https://keys.api.data.amsterdam.nl/clients/v1/",
+      "sensitive": true,
+      "required": false
+    }
+  },
+  "compatibility": {
+    "platforms": ["darwin", "win32", "linux"],
+    "runtimes": {
+      "node": ">=22.0.0"
+    }
+  }
+}

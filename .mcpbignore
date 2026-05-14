@@ -1,0 +1,14 @@
+apps/
+packages/
+.claude/
+node_modules/
+.turbo/
+.git/
+.DS_Store
+*.ts
+tsconfig*.json
+turbo.json
+pnpm-lock.yaml
+pnpm-workspace.yaml
+README.md
+*.mcpb

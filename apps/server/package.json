@@ -1,0 +1,44 @@
+{
+  "name": "@amsterdam-mcp/server",
+  "version": "0.1.0",
+  "description": "MCP server voor de publieke APIs van Gemeente Amsterdam",
+  "private": true,
+  "type": "module",
+  "main": "./dist/index.js",
+  "scripts": {
+    "build": "tsc",
+    "dev": "node --watch dist/index.js",
+    "start": "node dist/index.js",
+    "typecheck": "tsc --noEmit",
+    "clean": "rm -rf dist"
+  },
+  "dependencies": {
+    "@amsterdam-mcp/core": "workspace:^",
+    "@amsterdam-mcp/bag": "workspace:^",
+    "@amsterdam-mcp/gebieden": "workspace:^",
+    "@amsterdam-mcp/groen": "workspace:^",
+    "@amsterdam-mcp/verkeer": "workspace:^",
+    "@amsterdam-mcp/afval": "workspace:^",
+    "@amsterdam-mcp/bodem": "workspace:^",
+    "@amsterdam-mcp/erfgoed": "workspace:^",
+    "@amsterdam-mcp/duurzaamheid": "workspace:^",
+    "@amsterdam-mcp/vastgoed": "workspace:^",
+    "@amsterdam-mcp/openbare-ruimte": "workspace:^",
+    "@amsterdam-mcp/veiligheid": "workspace:^",
+    "@amsterdam-mcp/vergunningen": "workspace:^",
+    "@amsterdam-mcp/sport-voorzieningen": "workspace:^",
+    "@amsterdam-mcp/statistieken": "workspace:^",
+    "@amsterdam-mcp/water": "workspace:^",
+    "@amsterdam-mcp/wior": "workspace:^",
+    "@amsterdam-mcp/winkelgebieden": "workspace:^",
+    "@amsterdam-mcp/meldingen": "workspace:^",
+    "@amsterdam-mcp/verkiezingen": "workspace:^",
+    "@amsterdam-mcp/analyse": "workspace:^",
+    "fastmcp": "^4.0.1",
+    "zod": "^4.4.2"
+  },
+  "devDependencies": {
+    "@types/node": "^25.6.0",
+    "typescript": "*"
+  }
+}

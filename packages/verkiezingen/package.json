@@ -1,0 +1,28 @@
+{
+  "name": "@amsterdam-mcp/verkiezingen",
+  "version": "0.1.0",
+  "description": "Verkiezingen en stembureaus",
+  "type": "module",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "import": "./dist/index.js",
+      "types": "./dist/index.d.ts"
+    }
+  },
+  "scripts": {
+    "build": "tsc",
+    "typecheck": "tsc --noEmit",
+    "clean": "rm -rf dist"
+  },
+  "publishConfig": {
+    "access": "public"
+  },
+  "dependencies": {
+    "@amsterdam-mcp/core": "workspace:^"
+  },
+  "devDependencies": {
+    "typescript": "*"
+  }
+}
