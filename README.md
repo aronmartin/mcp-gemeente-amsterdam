@@ -4,6 +4,14 @@
 
 MCP server exposing all public APIs from [Gemeente Amsterdam](https://api.data.amsterdam.nl/v1/docs/index.html) to LLMs. Built with [FastMCP](https://github.com/punkpeye/fastmcp) as a Turborepo monorepo.
 
+## Install via .mcpb (recommended)
+
+**[Download mcp-gemeente-amsterdam.mcpb](https://github.com/aronmartin/mcp-gemeente-amsterdam/releases/latest/download/mcp-gemeente-amsterdam.mcpb)**
+
+1. Download the `.mcpb` file using the link above
+2. Open it — your MCP client (e.g. Claude Desktop) will handle the installation
+3. Enter your API key when prompted (see [API Key](#api-key) below)
+
 ## What can you do with this?
 
 Once connected to any MCP-compatible AI assistant, you can ask questions about Amsterdam in plain language. Some examples:
@@ -39,14 +47,6 @@ Once connected to any MCP-compatible AI assistant, you can ask questions about A
 **Property**
 - "What is the WOZ value of this address?"
 - "Are there known soil contamination reports for this plot?"
-
-## Install via .mcpb (recommended)
-
-**[Download mcp-gemeente-amsterdam.mcpb](https://github.com/aronmartin/mcp-gemeente-amsterdam/releases/latest/download/mcp-gemeente-amsterdam.mcpb)**
-
-1. Download the `.mcpb` file using the link above
-2. Open it — your MCP client (e.g. Claude Desktop) will handle the installation
-3. Enter your API key when prompted (see [API Key](#api-key) below)
 
 ## API Key
 
