@@ -1,0 +1,35 @@
+{
+  "name": "@amsterdam-mcp/filter-probe",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "build": "tsc",
+    "probe": "node dist/index.js"
+  },
+  "dependencies": {
+    "@amsterdam-mcp/core": "workspace:^",
+    "@amsterdam-mcp/afval": "workspace:^",
+    "@amsterdam-mcp/bag": "workspace:^",
+    "@amsterdam-mcp/bodem": "workspace:^",
+    "@amsterdam-mcp/duurzaamheid": "workspace:^",
+    "@amsterdam-mcp/erfgoed": "workspace:^",
+    "@amsterdam-mcp/gebieden": "workspace:^",
+    "@amsterdam-mcp/groen": "workspace:^",
+    "@amsterdam-mcp/meldingen": "workspace:^",
+    "@amsterdam-mcp/openbare-ruimte": "workspace:^",
+    "@amsterdam-mcp/sport-voorzieningen": "workspace:^",
+    "@amsterdam-mcp/statistieken": "workspace:^",
+    "@amsterdam-mcp/vastgoed": "workspace:^",
+    "@amsterdam-mcp/veiligheid": "workspace:^",
+    "@amsterdam-mcp/vergunningen": "workspace:^",
+    "@amsterdam-mcp/verkeer": "workspace:^",
+    "@amsterdam-mcp/verkiezingen": "workspace:^",
+    "@amsterdam-mcp/water": "workspace:^",
+    "@amsterdam-mcp/winkelgebieden": "workspace:^",
+    "@amsterdam-mcp/wior": "workspace:^"
+  },
+  "devDependencies": {
+    "@types/node": "^25.6.0",
+    "typescript": "*"
+  }
+}

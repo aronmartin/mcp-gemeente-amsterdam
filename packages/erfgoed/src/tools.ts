@@ -8,9 +8,8 @@ export const erfgoedToolDefinitions: readonly ToolDef[] = [
       naam: { type: "string", description: "Naam van het monument" },
       "naam[like]": { type: "string", description: "Naam bevat (wildcard)" },
       adressering: { type: "string", description: "Adres of straatnaam, bijv. 'Leidseplein'" },
+      jaarBeginVan: { type: "number", description: "Bouwjaar (exacte overeenkomst)" },
       oorspronkelijkeFunctie: { type: "string", description: "Oorspronkelijke functie, bijv. 'Woning', 'Kerk'" },
-      "jaarBeginVan[gte]": { type: "number", description: "Bouwjaar minimaal" },
-      "jaarBeginVan[lte]": { type: "number", description: "Bouwjaar maximaal" },
     },
   }),
   getTool({
