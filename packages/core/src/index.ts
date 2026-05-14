@@ -7,7 +7,7 @@ export {
   wgs84ToRd,
   haversineMeters,
   geomToCentroid,
-  buildBboxParam,
+  buildIntersectsParam,
   applyNearFilter,
   nearRadiusProps,
 } from "./geo.js";

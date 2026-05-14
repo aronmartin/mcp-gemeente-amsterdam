@@ -1,4 +1,4 @@
-import { listTool, getTool, type ToolDef } from "@amsterdam-mcp/core";
+import { listTool, getTool, type ToolDef, nearRadiusProps } from "@amsterdam-mcp/core";
 
 export const openbareRuimteToolDefinitions: readonly ToolDef[] = [
   listTool({
@@ -20,9 +20,13 @@ export const openbareRuimteToolDefinitions: readonly ToolDef[] = [
   }),
   listTool({
     name: "ams_meetbouten_list",
-    description: "Geeft meetbouten terug: bouts in de grond voor zakking-monitoring van de bodem.",
+    description: [
+      "Geeft meetbouten terug: bouts in de grond voor zakking-monitoring van de bodem.",
+      "Gebruik nearLat+nearLon+radiusMeters om meetbouten bij een specifiek adres te vinden (sorteert op afstand).",
+    ].join(" "),
     extraProps: {
       statusCode: { type: "number", description: "Status als getal, bijv. 1 (actief), 2 (vervallen)" },
+      ...nearRadiusProps,
     },
   }),
   getTool({
@@ -33,11 +37,15 @@ export const openbareRuimteToolDefinitions: readonly ToolDef[] = [
   }),
   listTool({
     name: "ams_civieleconstructies_list",
-    description: "Geeft kademuren terug uit de civiele constructies registratie.",
+    description: [
+      "Geeft kademuren terug uit de civiele constructies registratie.",
+      "Gebruik nearLat+nearLon+radiusMeters om kademuren bij een specifiek grachtenpand te vinden (sorteert op afstand).",
+    ].join(" "),
     extraProps: {
       beheerder: { type: "string", description: "Beheerder van de kademuur" },
       eigenaar: { type: "string", description: "Eigenaar van de kademuur" },
       materiaal: { type: "string", description: "Materiaal van de kademuur" },
+      ...nearRadiusProps,
     },
   }),
   listTool({

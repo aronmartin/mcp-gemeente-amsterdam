@@ -51,13 +51,15 @@ export function geomToCentroid(geom: unknown): { lat: number; lon: number } | nu
     : { lat: Math.round(sumY * 1e6) / 1e6, lon: Math.round(sumX * 1e6) / 1e6 };
 }
 
-/** WGS84 bbox (for RD-based API within_bbox filter) as "minX,minY,maxX,maxY" */
-export function buildBboxParam(nearLat: number, nearLon: number, radiusMeters: number): string {
+/** WKT POLYGON in WGS84 for API geo[intersects] filter */
+export function buildIntersectsParam(nearLat: number, nearLon: number, radiusMeters: number): string {
   const latOff = radiusMeters / METERS_PER_LAT_DEG;
   const lonOff = radiusMeters / METERS_PER_LON_DEG;
-  const [minX, minY] = wgs84ToRd(nearLat - latOff, nearLon - lonOff);
-  const [maxX, maxY] = wgs84ToRd(nearLat + latOff, nearLon + lonOff);
-  return `${minX},${minY},${maxX},${maxY}`;
+  const minLat = nearLat - latOff;
+  const maxLat = nearLat + latOff;
+  const minLon = nearLon - lonOff;
+  const maxLon = nearLon + lonOff;
+  return `POLYGON((${minLon} ${minLat}, ${maxLon} ${minLat}, ${maxLon} ${maxLat}, ${minLon} ${maxLat}, ${minLon} ${minLat}))`;
 }
 
 /**
