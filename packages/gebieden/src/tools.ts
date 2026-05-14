@@ -57,8 +57,9 @@ export const gebiedenToolDefinitions: readonly ToolDef[] = [
     description: [
       "Resolves an address or coordinates to the containing Amsterdam neighbourhood (buurt), district (wijk), and borough (stadsdeel) in a single call.",
       "Accepts either lat+lon (WGS84) or postcode+huisnummer.",
-      "Returns: adres (address details with coordinates), buurt (neighbourhood with CBS code), wijk (district), stadsdeel (borough).",
+      "Returns: adres (address details with coordinates), buurt (neighbourhood with CBS code), wijk (district), stadsdeel (borough), bag (BAG pand/verblijfsobject details including pandId), erfgoed (monument status for the pand — empty array means no monument).",
       "Use this to get buurt/wijk/stadsdeel identificaties for filtering tools like ams_gebieden_list_buurten or ams_afvalcontainers_list.",
+      "Also use bag.pandId from the result as betreftBagPand.identificatie when querying ams_monumenten_list — this is more reliable than nearLat/nearLon or adressering for ensemble monuments where the centroid may lie far from the queried address.",
     ].join(" "),
     parameters: {
       type: "object" as const,

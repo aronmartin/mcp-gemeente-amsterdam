@@ -1,4 +1,4 @@
-import { listTool, type ToolDef } from "@amsterdam-mcp/core";
+import { listTool, type ToolDef, nearRadiusProps } from "@amsterdam-mcp/core";
 
 export const verkeerToolDefinitions: readonly ToolDef[] = [
   listTool({
@@ -14,28 +14,46 @@ export const verkeerToolDefinitions: readonly ToolDef[] = [
   }),
   listTool({
     name: "ams_parkeerzones_list",
-    description: "Geeft parkeerzones terug met gebiedsnaam, code en vergunningregime.",
+    description: [
+      "Geeft parkeerzones terug met gebiedsnaam, code en vergunningregime.",
+      "Gebruik nearLat+nearLon+radiusMeters (~50m) om te controleren in welke parkeerzone een adres valt.",
+    ].join(" "),
     extraProps: {
       gebiedsnaam: { type: "string", description: "Naam van de parkeerzone" },
       gebiedscode: { type: "string", description: "Code van de zone, bijv. 'A'" },
+      ...nearRadiusProps,
     },
   }),
   listTool({
     name: "ams_milieuzones_list",
-    description: "Geeft huidige milieuzones terug (voor voertuigrestricties).",
+    description: [
+      "Geeft huidige milieuzones terug (voor voertuigrestricties).",
+      "Gebruik nearLat+nearLon+radiusMeters (~50m) om te controleren of een adres binnen een milieuzone valt.",
+    ].join(" "),
     extraProps: {
       verkeerstype: { type: "string", description: "Verkeerstype waarop de zone van toepassing is" },
+      ...nearRadiusProps,
     },
   }),
   listTool({
     name: "ams_milieuzones2025_list",
-    description: "Geeft milieuzones 2025 terug (toekomstige zones, strenger).",
-    extraProps: {},
+    description: [
+      "Geeft milieuzones 2025 terug (toekomstige zones, strenger).",
+      "Gebruik nearLat+nearLon+radiusMeters (~50m) om te controleren of een adres binnen een milieuzone 2025 valt.",
+    ].join(" "),
+    extraProps: {
+      ...nearRadiusProps,
+    },
   }),
   listTool({
     name: "ams_uitstootvrije_zones_list",
-    description: "Geeft uitstootvrije zones terug (zero-emissiezones).",
-    extraProps: {},
+    description: [
+      "Geeft uitstootvrije zones terug (zero-emissiezones).",
+      "Gebruik nearLat+nearLon+radiusMeters (~50m) om te controleren of een adres binnen een uitstootvrije zone valt.",
+    ].join(" "),
+    extraProps: {
+      ...nearRadiusProps,
+    },
   }),
   listTool({
     name: "ams_wegenbestand_list",

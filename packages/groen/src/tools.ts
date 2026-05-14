@@ -3,7 +3,10 @@ import { listTool, getTool, type ToolDef } from "@amsterdam-mcp/core";
 export const groenToolDefinitions: readonly ToolDef[] = [
   listTool({
     name: "ams_bomen_list",
-    description: "Zoek bomen in Amsterdam op soort, buurt of aanlegjaar.",
+    description: [
+      "Zoek bomen in Amsterdam op soort, buurt of aanlegjaar.",
+      "Voor buurt-filtering: gebruik eerst ams_resolve_location met het adres om buurt.identificatie te verkrijgen, filter dan op gbdBuurt.identificatie.",
+    ].join(" "),
     extraProps: {
       soortnaamTop: { type: "string", description: "Hoofdsoort, bijv. 'Plataan', 'Eik', 'Iep'" },
       soortnaamKort: { type: "string", description: "Korte soortnaam" },
@@ -12,7 +15,7 @@ export const groenToolDefinitions: readonly ToolDef[] = [
       "jaarVanAanleg[lte]": { type: "number", description: "Aanlegjaar maximaal" },
       typeEigenaarPlus: { type: "string", description: "Eigenaar/beheerder, bijv. 'Gemeente Amsterdam'" },
       boomhoogteklasseActueel: { type: "string", description: "Hoogteklasse, bijv. 'a: tot 6 m.'" },
-      "gbdBuurt.identificatie": { type: "string", description: "Buurt-identificatiecode" },
+      "gbdBuurt.identificatie": { type: "string", description: "Buurt-identificatiecode — gebruik ams_resolve_location (buurt.identificatie) om dit op te zoeken" },
     },
   }),
   getTool({
@@ -32,11 +35,14 @@ export const groenToolDefinitions: readonly ToolDef[] = [
   }),
   listTool({
     name: "ams_ziekte_plagen_exoten_list",
-    description: "Geeft meldingen van eikenprocessierups en andere ziekten, plagen en exoten terug.",
+    description: [
+      "Geeft meldingen van eikenprocessierups en andere ziekten, plagen en exoten terug.",
+      "Voor buurt-filtering: gebruik eerst ams_resolve_location met het adres om buurt.identificatie te verkrijgen, filter dan op gbdBuurt.identificatie.",
+    ].join(" "),
     extraProps: {
       status: { type: "string", description: "Status van de melding" },
       urgentie: { type: "string", description: "Urgentieniveau" },
-      "gbdBuurt.identificatie": { type: "string", description: "Buurt-identificatiecode" },
+      "gbdBuurt.identificatie": { type: "string", description: "Buurt-identificatiecode — gebruik ams_resolve_location (buurt.identificatie) om dit op te zoeken" },
     },
   }),
   listTool({

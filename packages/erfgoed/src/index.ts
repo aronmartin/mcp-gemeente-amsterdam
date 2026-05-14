@@ -24,7 +24,17 @@ export async function handleErfgoedTool(
       return listMonumenten(rest as QueryParams);
     }
     case "ams_monumenten_get": return getMonument(args.id as string);
-    case "ams_beschermde_stadsgezichten_list": return listBeschermdeStadsgezichten(args as QueryParams);
+    case "ams_beschermde_stadsgezichten_list": {
+      const { nearLat, nearLon, radiusMeters, page_size, ...rest } = args;
+      if (nearLat !== undefined && nearLon !== undefined) {
+        return fetchNearRadius(
+          defaultClient, "beschermdestadsdorpsgezichten", "beschermdestadsdorpsgezichten", "geometrie[intersects]",
+          nearLat as number, nearLon as number, (radiusMeters as number) ?? 500,
+          rest as QueryParams, (page_size as number) ?? 20,
+        );
+      }
+      return listBeschermdeStadsgezichten(args as QueryParams);
+    }
     case "ams_amsterdam_canon_list": return listCanon(args as QueryParams);
     default: throw new Error(`Onbekende erfgoed tool: ${toolName}`);
   }

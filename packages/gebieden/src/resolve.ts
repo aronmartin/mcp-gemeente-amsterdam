@@ -1,4 +1,4 @@
-import { defaultClient, type QueryParams } from "@amsterdam-mcp/core";
+import { defaultClient, type QueryParams, type DsoPage } from "@amsterdam-mcp/core";
 
 const PDOK_REVERSE = "https://api.pdok.nl/bzk/locatieserver/search/v3_1/reverse";
 const PDOK_FREE = "https://api.pdok.nl/bzk/locatieserver/search/v3_1/free";
@@ -61,6 +61,13 @@ type StadsdeelRaw = {
   code?: string;
 };
 
+type MonumentSummary = {
+  identificatie?: string;
+  naam?: string;
+  monumentTypeOmschrijving?: string;
+  statusOmschrijving?: string;
+};
+
 export type BagInfo = {
   nummeraanduidingId: string;
   verblijfsobjectId: string;
@@ -85,6 +92,7 @@ export type ResolvedLocation = {
   wijk: { naam?: string; code?: string; identificatie?: string } | null;
   stadsdeel: { naam?: string; code?: string; identificatie?: string } | null;
   bag: BagInfo | null;
+  erfgoed: { monumenten: MonumentSummary[] } | null;
 };
 
 export async function resolveLocation(params: {
@@ -121,6 +129,10 @@ export async function resolveLocation(params: {
     pdokReverse(lat, lon, "buurt", "buurtnaam,buurtcode"),
     resolveBag(postcode, huisnummer),
   ]);
+
+  const erfgoedResult = bagResult?.pandId
+    ? await resolveMonumenten(bagResult.pandId)
+    : null;
 
   const cbsCode = buurtDoc?.buurtcode?.replace(/^BU\d{4}/, "") ?? null;
 
@@ -160,7 +172,26 @@ export async function resolveLocation(params: {
     wijk: wijkResult,
     stadsdeel: stadsdeelResult,
     bag: bagResult,
+    erfgoed: erfgoedResult,
   };
+}
+
+async function resolveMonumenten(pandId: string): Promise<{ monumenten: MonumentSummary[] } | null> {
+  try {
+    const page = await defaultClient.list<MonumentSummary>(
+      "monumenten", "monumenten",
+      { "betreftBagPand.identificatie": pandId, page_size: 10 } as QueryParams,
+    );
+    const items = Object.values((page as DsoPage<MonumentSummary>)._embedded ?? {}).flat();
+    return { monumenten: items.map(m => ({
+      identificatie: m.identificatie,
+      naam: m.naam,
+      monumentTypeOmschrijving: m.monumentTypeOmschrijving,
+      statusOmschrijving: m.statusOmschrijving,
+    })) };
+  } catch {
+    return null;
+  }
 }
 
 type NumRaw = {

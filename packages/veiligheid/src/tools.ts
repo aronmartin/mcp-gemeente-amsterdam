@@ -1,4 +1,4 @@
-import { listTool, type ToolDef } from "@amsterdam-mcp/core";
+import { listTool, type ToolDef, nearRadiusProps } from "@amsterdam-mcp/core";
 
 export const veiligheidToolDefinitions: readonly ToolDef[] = [
   listTool({
@@ -13,20 +13,28 @@ export const veiligheidToolDefinitions: readonly ToolDef[] = [
   }),
   listTool({
     name: "ams_geluidszones_list",
-    description: "Geeft geluidszones terug: wettelijke zones rondom industrie, wegen en het spoor.",
+    description: [
+      "Geeft geluidszones terug: wettelijke zones rondom industrie, wegen en het spoor.",
+      "Gebruik nearLat+nearLon+radiusMeters (~50m) om te controleren of een adres binnen een geluidszone valt.",
+    ].join(" "),
     extraProps: {
       naam: { type: "string", description: "Naam van de geluidszone" },
       thema: { type: "string", description: "Thema van de zone" },
+      ...nearRadiusProps,
     },
   }),
   listTool({
     name: "ams_overlastgebieden_list",
-    description: "Geeft overlastgebieden terug: gebieden met verhoogde handhaving of beperkingen.",
+    description: [
+      "Geeft overlastgebieden terug: gebieden met verhoogde handhaving of beperkingen.",
+      "Gebruik nearLat+nearLon+radiusMeters (~50m) om te controleren of een adres binnen een overlastgebied valt.",
+    ].join(" "),
     extraProps: {
       oovNaam: { type: "string", description: "Naam van het overlastgebied" },
       oovCode: { type: "string", description: "Code van het overlastgebied" },
       type: { type: "string", description: "Type overlastgebied" },
       soort: { type: "string", description: "Soort overlast" },
+      ...nearRadiusProps,
     },
   }),
   listTool({

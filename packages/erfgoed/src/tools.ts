@@ -1,12 +1,14 @@
 import { listTool, getTool, type ToolDef, nearRadiusProps } from "@amsterdam-mcp/core";
 
+
 export const erfgoedToolDefinitions: readonly ToolDef[] = [
   listTool({
     name: "ams_monumenten_list",
     description: [
       "Zoek Amsterdamse monumenten (monuments, heritage, listed buildings) op naam, adres of bouwjaar.",
-      "Gebruik adressering[like] voor gedeeltelijke straatnaam/adres-matching.",
-      "Gebruik nearLat+nearLon+radiusMeters om monumenten in de buurt van een punt te vinden (sorteert op afstand, voegt _distanceMeters toe).",
+      "Voor adres-gebaseerde lookup: gebruik bij voorkeur betreftBagPand.identificatie (haal bag.pandId op via ams_resolve_location) — dit is betrouwbaarder dan nearLat/nearLon of adressering[like] voor ensemble-monumenten waarbij het centroid ver van het gezochte adres kan liggen.",
+      "Gebruik adressering[like] voor gedeeltelijke straatnaam/adres-matching (minder betrouwbaar voor ensembles).",
+      "Gebruik nearLat+nearLon+radiusMeters om monumenten in de buurt van een punt te vinden (sorteert op afstand, voegt _distanceMeters toe; minder betrouwbaar voor ensembles).",
     ].join(" "),
     extraProps: {
       naam: { type: "string", description: "Naam van het monument (exact)" },
@@ -27,9 +29,13 @@ export const erfgoedToolDefinitions: readonly ToolDef[] = [
   }),
   listTool({
     name: "ams_beschermde_stadsgezichten_list",
-    description: "Geeft beschermde stads- en dorpsgezichten terug (aangewezen beschermde gebieden).",
+    description: [
+      "Geeft beschermde stads- en dorpsgezichten terug (aangewezen beschermde gebieden).",
+      "Gebruik nearLat+nearLon+radiusMeters (~50m) om te controleren of een specifiek adres binnen een beschermd gezicht valt.",
+    ].join(" "),
     extraProps: {
       naam: { type: "string", description: "Naam van het beschermde gezicht" },
+      ...nearRadiusProps,
     },
   }),
   listTool({
