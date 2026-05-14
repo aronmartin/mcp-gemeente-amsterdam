@@ -19,7 +19,6 @@ export const vastgoedToolDefinitions: readonly ToolDef[] = [
     name: "ams_gemeentelijk_vastgoed_list",
     description: "Geeft gemeentelijk vastgoed terug (panden en terreinen in eigendom van de gemeente Amsterdam).",
     extraProps: {
-      naam: { type: "string", description: "Naam van het object" },
       eigendom: { type: "string", description: "Eigendomsvorm" },
       straatnaam: { type: "string", description: "Straatnaam" },
       huisnummer: { type: "number", description: "Huisnummer" },
@@ -29,7 +28,6 @@ export const vastgoedToolDefinitions: readonly ToolDef[] = [
     name: "ams_nieuwbouwplannen_list",
     description: "Geeft nieuwbouwplannen terug (publiek deel): woningbouwprojecten in Amsterdam.",
     extraProps: {
-      naam: { type: "string", description: "Naam van het project" },
       buurtCode: { type: "string", description: "Buurtcode" },
       buurtNaam: { type: "string", description: "Naam van de buurt" },
       wijkCode: { type: "string", description: "Wijkcode" },

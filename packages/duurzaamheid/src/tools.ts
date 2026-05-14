@@ -14,7 +14,6 @@ export const duurzaamheidToolDefinitions: readonly ToolDef[] = [
     name: "ams_duurzaamheid_list",
     description: "Geeft duurzaamheidsdata terug (warmtenetten, isolatieprojecten, etc.).",
     extraProps: {
-      typeOmschrijving: { type: "string", description: "Type duurzaamheidsproject" },
     },
   }),
   listTool({

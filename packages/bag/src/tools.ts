@@ -3,9 +3,9 @@ import { listTool, getTool, type ToolDef } from "@amsterdam-mcp/core";
 export const bagToolDefinitions: readonly ToolDef[] = [
   listTool({
     name: "ams_bag_list_verblijfsobjecten",
-    description: "Zoek verblijfsobjecten (woningen, kantoren, winkels) in Amsterdam via postcode of gebruiksdoel.",
+    description: "Zoek verblijfsobjecten (woningen, kantoren, winkels) in Amsterdam via postcode, huisnummer of gebruiksdoel.",
     extraProps: {
-      postcode: { type: "string", description: "Postcode, bijv. '1012JS'" },
+      "heeftHoofdadres.postcode": { type: "string", description: "Postcode, bijv. '1012JS'" },
       "heeftHoofdadres.huisnummer": { type: "number", description: "Huisnummer" },
       "heeftHoofdadres.ligtAanOpenbareruimte.naam": { type: "string", description: "Straatnaam" },
       gebruiksdoel: { type: "string", description: "Gebruiksdoel, bijv. 'woonfunctie' of 'kantoorfunctie'" },

@@ -24,6 +24,76 @@ importers:
         specifier: ^5.7.3
         version: 5.9.3
 
+  apps/filter-probe:
+    dependencies:
+      '@amsterdam-mcp/afval':
+        specifier: workspace:^
+        version: link:../../packages/afval
+      '@amsterdam-mcp/bag':
+        specifier: workspace:^
+        version: link:../../packages/bag
+      '@amsterdam-mcp/bodem':
+        specifier: workspace:^
+        version: link:../../packages/bodem
+      '@amsterdam-mcp/core':
+        specifier: workspace:^
+        version: link:../../packages/core
+      '@amsterdam-mcp/duurzaamheid':
+        specifier: workspace:^
+        version: link:../../packages/duurzaamheid
+      '@amsterdam-mcp/erfgoed':
+        specifier: workspace:^
+        version: link:../../packages/erfgoed
+      '@amsterdam-mcp/gebieden':
+        specifier: workspace:^
+        version: link:../../packages/gebieden
+      '@amsterdam-mcp/groen':
+        specifier: workspace:^
+        version: link:../../packages/groen
+      '@amsterdam-mcp/meldingen':
+        specifier: workspace:^
+        version: link:../../packages/meldingen
+      '@amsterdam-mcp/openbare-ruimte':
+        specifier: workspace:^
+        version: link:../../packages/openbare-ruimte
+      '@amsterdam-mcp/sport-voorzieningen':
+        specifier: workspace:^
+        version: link:../../packages/sport-voorzieningen
+      '@amsterdam-mcp/statistieken':
+        specifier: workspace:^
+        version: link:../../packages/statistieken
+      '@amsterdam-mcp/vastgoed':
+        specifier: workspace:^
+        version: link:../../packages/vastgoed
+      '@amsterdam-mcp/veiligheid':
+        specifier: workspace:^
+        version: link:../../packages/veiligheid
+      '@amsterdam-mcp/vergunningen':
+        specifier: workspace:^
+        version: link:../../packages/vergunningen
+      '@amsterdam-mcp/verkeer':
+        specifier: workspace:^
+        version: link:../../packages/verkeer
+      '@amsterdam-mcp/verkiezingen':
+        specifier: workspace:^
+        version: link:../../packages/verkiezingen
+      '@amsterdam-mcp/water':
+        specifier: workspace:^
+        version: link:../../packages/water
+      '@amsterdam-mcp/winkelgebieden':
+        specifier: workspace:^
+        version: link:../../packages/winkelgebieden
+      '@amsterdam-mcp/wior':
+        specifier: workspace:^
+        version: link:../../packages/wior
+    devDependencies:
+      '@types/node':
+        specifier: ^25.6.0
+        version: 25.6.0
+      typescript:
+        specifier: '*'
+        version: 5.9.3
+
   apps/server:
     dependencies:
       '@amsterdam-mcp/afval':
