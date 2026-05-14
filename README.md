@@ -10,7 +10,7 @@ Download the latest `.mcpb` from [GitHub Releases](https://github.com/aronmartin
 
 ## API Key
 
-All tools work without an API key. If you have one, add it as `AMSTERDAM_API_KEY` in your environment or via the `.mcpb` installer prompt. Request one at [keys.api.data.amsterdam.nl](https://keys.api.data.amsterdam.nl/clients/v1/).
+An API key is required. Register one at [keys.api.data.amsterdam.nl](https://keys.api.data.amsterdam.nl/clients/v1/) and add it as `AMSTERDAM_API_KEY` in your environment or via the `.mcpb` installer prompt.
 
 ## Packages
 

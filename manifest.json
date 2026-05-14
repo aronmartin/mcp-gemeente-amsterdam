@@ -2,7 +2,7 @@
   "manifest_version": "0.3",
   "name": "mcp-gemeente-amsterdam",
   "display_name": "Gemeente Amsterdam",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Toegang tot alle publieke APIs van Gemeente Amsterdam: gebouwen, gebieden, verkeer, afval, erfgoed, vergunningen en meer.",
   "author": {
     "name": "Aron Martin"
@@ -28,9 +28,9 @@
     "amsterdam_api_key": {
       "type": "string",
       "title": "Amsterdam API Key",
-      "description": "Optionele API key voor api.data.amsterdam.nl. Aan te vragen via https://keys.api.data.amsterdam.nl/clients/v1/",
+      "description": "Verplichte API key voor api.data.amsterdam.nl. Aanvragen via https://keys.api.data.amsterdam.nl/clients/v1/",
       "sensitive": true,
-      "required": false
+      "required": true
     }
   },
   "compatibility": {
