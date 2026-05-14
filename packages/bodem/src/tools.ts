@@ -1,10 +1,21 @@
-import { listTool, type ToolDef } from "@amsterdam-mcp/core";
+import { listTool, type ToolDef, nearRadiusProps } from "@amsterdam-mcp/core";
 
 export const bodemToolDefinitions: readonly ToolDef[] = [
   listTool({
     name: "ams_bodemonderzoeken_list",
-    description: "Geeft bodemonderzoeken terug. Toont locaties waar bodemonderzoek is gedaan.",
-    extraProps: {},
+    description: [
+      "Geeft bodemonderzoeken terug. Toont locaties waar bodemonderzoek is gedaan, met verontreinigingsoordeel.",
+      "Gebruik nearLat+nearLon+radiusMeters om onderzoeken bij een specifiek adres te vinden.",
+    ].join(" "),
+    extraProps: {
+      straatnaam: { type: "string", description: "Straatnaam van de onderzoekslocatie" },
+      gbdBuurtCode: { type: "string", description: "CBS-buurtcode (bijv. 'MD01') — gebruik ams_resolve_location om op te zoeken" },
+      eindoordeel: { type: "string", description: "Verontreinigingsoordeel: '>I' (interventiewaarde), '>S' (streefwaarde), '>T' (tussenwaarde), 'Schoon'" },
+      bagPandId: { type: "string", description: "BAG-pandidentificatie om onderzoeken bij een specifiek pand te vinden" },
+      "rapportdatum[gte]": { type: "string", description: "Rapportdatum vanaf (YYYY-MM-DD)" },
+      "rapportdatum[lte]": { type: "string", description: "Rapportdatum tot (YYYY-MM-DD)" },
+      ...nearRadiusProps,
+    },
   }),
   listTool({
     name: "ams_historische_bodeminformatie_list",
