@@ -11,20 +11,25 @@ export const gebiedenToolDefinitions: readonly ToolDef[] = [
   }),
   listTool({
     name: "ams_gebieden_list_wijken",
-    description: "Geeft wijken terug, optioneel gefilterd op stadsdeel.",
+    description: [
+      "Geeft wijken terug, optioneel gefilterd op stadsdeel.",
+      "Voor stadsdeel-filtering: gebruik ams_gebieden_list_stadsdelen om de identificatie op te zoeken, filter dan op ligtInStadsdeel.identificatie.",
+    ].join(" "),
     extraProps: {
       naam: { type: "string", description: "Naam van de wijk" },
-      "ligtInStadsdeel.naam": { type: "string", description: "Naam van het stadsdeel" },
-      "ligtInStadsdeel.code": { type: "string", description: "Code van het stadsdeel" },
+      "ligtInStadsdeel.identificatie": { type: "string", description: "Stadsdeel-identificatie (opzoeken via ams_gebieden_list_stadsdelen)" },
     },
   }),
   listTool({
     name: "ams_gebieden_list_buurten",
-    description: "Geeft buurten terug, optioneel gefilterd op naam, code of wijk.",
+    description: [
+      "Geeft buurten terug, optioneel gefilterd op naam, code of wijk.",
+      "Voor wijk-filtering: gebruik ams_gebieden_list_wijken om de identificatie op te zoeken, filter dan op ligtInWijk.identificatie.",
+    ].join(" "),
     extraProps: {
       naam: { type: "string", description: "Naam van de buurt" },
       code: { type: "string", description: "Buurtcode" },
-      "ligtInWijk.naam": { type: "string", description: "Naam van de wijk" },
+      "ligtInWijk.identificatie": { type: "string", description: "Wijk-identificatie (opzoeken via ams_gebieden_list_wijken)" },
     },
   }),
   getTool({
@@ -53,7 +58,7 @@ export const gebiedenToolDefinitions: readonly ToolDef[] = [
       "Resolves an address or coordinates to the containing Amsterdam neighbourhood (buurt), district (wijk), and borough (stadsdeel) in a single call.",
       "Accepts either lat+lon (WGS84) or postcode+huisnummer.",
       "Returns: adres (address details with coordinates), buurt (neighbourhood with CBS code), wijk (district), stadsdeel (borough).",
-      "Use this before calling any tool that accepts gbdBuurtCode, gbdWijkNaam, or gbdStadsdeelNaam filters.",
+      "Use this to get buurt/wijk/stadsdeel identificaties for filtering tools like ams_gebieden_list_buurten or ams_afvalcontainers_list.",
     ].join(" "),
     parameters: {
       type: "object" as const,

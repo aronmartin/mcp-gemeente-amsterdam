@@ -3,12 +3,13 @@ import { listTool, getTool, type ToolDef } from "@amsterdam-mcp/core";
 export const bagToolDefinitions: readonly ToolDef[] = [
   listTool({
     name: "ams_bag_list_verblijfsobjecten",
-    description: "Zoek verblijfsobjecten (woningen, kantoren, winkels) in Amsterdam via postcode, huisnummer of gebruiksdoel.",
+    description: [
+      "Zoek verblijfsobjecten (woningen, kantoren, winkels) in Amsterdam via gebruiksdoel of status.",
+      "Om te filteren op adres: gebruik eerst ams_bag_list_nummeraanduidingen (postcode + huisnummer) om de nummeraanduiding-identificatie te vinden, filter dan op heeftHoofdadres.identificatie.",
+    ].join(" "),
     extraProps: {
-      "heeftHoofdadres.postcode": { type: "string", description: "Postcode, bijv. '1012JS'" },
-      "heeftHoofdadres.huisnummer": { type: "number", description: "Huisnummer" },
-      "heeftHoofdadres.ligtAanOpenbareruimte.naam": { type: "string", description: "Straatnaam" },
-      gebruiksdoel: { type: "string", description: "Gebruiksdoel, bijv. 'woonfunctie' of 'kantoorfunctie'" },
+      "heeftHoofdadres.identificatie": { type: "string", description: "Nummeraanduiding-identificatie (14-cijferig BAG-ID van het hoofdadres)" },
+      "gebruiksdoel.omschrijving": { type: "string", description: "Gebruiksdoel, bijv. 'woonfunctie' of 'kantoorfunctie'" },
       statusCode: { type: "string", description: "Status, bijv. '1' (in gebruik)" },
     },
   }),
@@ -36,11 +37,14 @@ export const bagToolDefinitions: readonly ToolDef[] = [
   }),
   listTool({
     name: "ams_bag_list_nummeraanduidingen",
-    description: "Zoek adressen (nummeraanduidingen) op postcode, huisnummer of straat.",
+    description: [
+      "Zoek adressen (nummeraanduidingen) op postcode, huisnummer of straat.",
+      "Voor straatnaam-zoeken: gebruik eerst ams_bag_list_openbareruimtes met naam om de identificatie op te zoeken, filter dan op ligtAanOpenbareruimte.identificatie.",
+    ].join(" "),
     extraProps: {
       postcode: { type: "string", description: "Postcode, bijv. '1012JS'" },
       huisnummer: { type: "number", description: "Huisnummer" },
-      "ligtAanOpenbareruimte.naam": { type: "string", description: "Straatnaam" },
+      "ligtAanOpenbareruimte.identificatie": { type: "string", description: "Openbare ruimte identificatie (opzoeken via ams_bag_list_openbareruimtes)" },
       typeAdres: { type: "string", description: "'hoofdadres' of 'nevenadres'" },
     },
   }),

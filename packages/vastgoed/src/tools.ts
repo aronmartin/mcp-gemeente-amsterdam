@@ -6,13 +6,12 @@ export const vastgoedToolDefinitions: readonly ToolDef[] = [
     description: [
       "Geeft WOZ-objecten terug met gebruikscode, soortobject en geldigheidsdatum.",
       "Let op: de vastgesteldeWaarde (WOZ-bedrag) is niet beschikbaar in deze publieke API — alleen objecttype en gebruikscode worden ontsloten.",
-      "Filter op bagNummeraanduidingId of postcode+huisnummer om een specifiek adres op te zoeken.",
+      "Filter op wozobjectnummer of bevatBrkKadastraalobject.identificatie om een specifiek object op te zoeken.",
+      "Om WOZ via een BAG-adres te vinden: gebruik eerst ams_bag_list_verblijfsobjecten om het verblijfsobject op te zoeken, dan ams_woz_list met het wozobjectnummer.",
     ].join(" "),
     extraProps: {
       wozobjectnummer: { type: "string", description: "WOZ-objectnummer" },
-      bagNummeraanduidingId: { type: "string", description: "BAG-nummeraanduidingidentificatie (gebruik ams_resolve_location of bag tools om dit op te zoeken)" },
-      postcode: { type: "string", description: "Postcode van het adres (bijv. '1017BN')" },
-      huisnummer: { type: "number", description: "Huisnummer" },
+      "bevatBrkKadastraalobject.identificatie": { type: "string", description: "BRK kadastraalobject identificatie" },
     },
   }),
   listTool({
