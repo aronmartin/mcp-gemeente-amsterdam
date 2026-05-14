@@ -4,6 +4,42 @@
 
 MCP server exposing all public APIs from [Gemeente Amsterdam](https://api.data.amsterdam.nl/v1/docs/index.html) to LLMs. Built with [FastMCP](https://github.com/punkpeye/fastmcp) as a Turborepo monorepo.
 
+## What can you do with this?
+
+Once connected to Claude, you can ask questions about Amsterdam in plain language. Some examples:
+
+**Buildings & addresses**
+- "What year was the building at Keizersgracht 123 constructed?"
+- "How many residential units are in this block?"
+
+**Neighbourhoods & areas**
+- "Which neighbourhood is the Rijksmuseum in, and what district does it belong to?"
+- "Give me an overview of all boroughs in Amsterdam."
+
+**Monuments & heritage**
+- "Which monuments are located in the Jordaan?"
+- "Is this building a protected city view?"
+
+**Waste & recycling**
+- "Where is the nearest glass container to Leidseplein?"
+- "When is paper waste collected at this address?"
+
+**Parking & traffic**
+- "Where can I park near Centraal Station?"
+- "Is my address within a low-emission zone?"
+
+**Permits & events**
+- "Which events have a permit in the city centre this month?"
+- "Are there active excavation works near this address?"
+
+**Sustainability & energy**
+- "Is this street part of a gas-free zone?"
+- "What is the energy consumption in this neighbourhood?"
+
+**Property**
+- "What is the WOZ value of this address?"
+- "Are there known soil contamination reports for this plot?"
+
 ## Install via .mcpb (recommended)
 
 Download the latest `.mcpb` from [GitHub Releases](https://github.com/aronmartin/mcp-gemeente-amsterdam/releases/latest) and open it in Claude Desktop or another MCP client for one-click installation. The client will optionally prompt for an API key.
