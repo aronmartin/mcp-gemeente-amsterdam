@@ -47,13 +47,18 @@ type BuurtRaw = {
   identificatie?: string;
   naam?: string;
   code?: string;
-  ligtInWijk?: { naam?: string; code?: string; identificatie?: string };
+  ligtInWijkId?: string;
 };
 type WijkRaw = {
   identificatie?: string;
   naam?: string;
   code?: string;
-  ligtInStadsdeel?: { naam?: string; code?: string; identificatie?: string };
+  ligtInStadsdeelId?: string;
+};
+type StadsdeelRaw = {
+  identificatie?: string;
+  naam?: string;
+  code?: string;
 };
 
 export type ResolvedLocation = {
@@ -106,20 +111,18 @@ export async function resolveLocation(params: {
   let stadsdeelResult: ResolvedLocation["stadsdeel"] = null;
 
   if (cbsCode) {
-    const buurtPage = await defaultClient.list<BuurtRaw>("gebieden", "buurten", { code: cbsCode, page_size: 1, _expand: true });
+    const buurtPage = await defaultClient.list<BuurtRaw>("gebieden", "buurten", { code: cbsCode, page_size: 1 });
     const buurt = Object.values(buurtPage._embedded ?? {}).flat()[0];
     if (buurt) {
       buurtResult = { naam: buurt.naam, code: buurt.code, cbsCode, identificatie: buurt.identificatie };
-      if (buurt.ligtInWijk?.code) {
-        const wijkPage = await defaultClient.list<WijkRaw>("gebieden", "wijken", {
-          code: buurt.ligtInWijk.code,
-          page_size: 1,
-          _expand: true,
-        });
-        const wijk = Object.values(wijkPage._embedded ?? {}).flat()[0];
+      if (buurt.ligtInWijkId) {
+        const wijk = await defaultClient.get<WijkRaw>("gebieden", "wijken", buurt.ligtInWijkId);
         if (wijk) {
           wijkResult = { naam: wijk.naam, code: wijk.code, identificatie: wijk.identificatie };
-          stadsdeelResult = wijk.ligtInStadsdeel ?? null;
+          if (wijk.ligtInStadsdeelId) {
+            const stadsdeel = await defaultClient.get<StadsdeelRaw>("gebieden", "stadsdelen", wijk.ligtInStadsdeelId);
+            stadsdeelResult = stadsdeel ? { naam: stadsdeel.naam, code: stadsdeel.code, identificatie: stadsdeel.identificatie } : null;
+          }
         }
       }
     }

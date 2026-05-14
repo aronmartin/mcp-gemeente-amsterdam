@@ -1,6 +1,6 @@
 import { listAfvalcontainers, getAfvalcontainer, listAfvalwijzer, listRecyclepunten } from "./client.js";
 import { afvalToolDefinitions } from "./tools.js";
-import { applyNearFilter, type QueryParams } from "@amsterdam-mcp/core";
+import { applyNearFilter, buildIntersectsParam, type QueryParams } from "@amsterdam-mcp/core";
 
 export { afvalToolDefinitions };
 export * from "./client.js";
@@ -15,7 +15,7 @@ export async function handleAfvalTool(
       const params = rest as QueryParams;
       if (nearLat !== undefined && nearLon !== undefined) {
         const radius = (radiusMeters as number) ?? 500;
-        params.page_size = params.page_size ?? 1000;
+        params["geometrie[intersects]"] = buildIntersectsParam(nearLat as number, nearLon as number, radius);
         const page = await listAfvalcontainers(params);
         return applyNearFilter(page as Parameters<typeof applyNearFilter>[0], nearLat as number, nearLon as number, radius);
       }
