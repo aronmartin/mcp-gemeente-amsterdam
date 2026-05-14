@@ -23,7 +23,6 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: "22"
-          cache: "pnpm"
 
       - name: Determine version bump
         id: version
@@ -97,6 +96,18 @@ jobs:
           git commit -m "chore: release ${{ steps.version.outputs.tag }}"
           git tag "${{ steps.version.outputs.tag }}"
           git push origin main "${{ steps.version.outputs.tag }}"
+
+      - name: Get pnpm store path
+        if: steps.version.outputs.skip != 'true'
+        id: pnpm-cache
+        run: echo "dir=$(pnpm store path)" >> "$GITHUB_OUTPUT"
+
+      - uses: actions/cache@v4
+        if: steps.version.outputs.skip != 'true'
+        with:
+          path: ${{ steps.pnpm-cache.outputs.dir }}
+          key: ${{ runner.os }}-pnpm-${{ hashFiles('**/pnpm-lock.yaml') }}
+          restore-keys: ${{ runner.os }}-pnpm-
 
       - name: Build .mcpb
         if: steps.version.outputs.skip != 'true'
