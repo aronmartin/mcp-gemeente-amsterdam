@@ -10,7 +10,7 @@ export const afvalToolDefinitions: readonly ToolDef[] = [
     ].join(" "),
     extraProps: {
       fractieOmschrijving: { type: "string", description: "Afvalfractie: 'Glas', 'Papier', 'Restafval', 'Textiel', 'Plastic', 'Brood', 'GFT'" },
-      gbdBuurtId: { type: "string", description: "Buurt-identificatie (bijv. '03630980000386') — gebruik ams_resolve_location om dit op te zoeken" },
+      "gbdBuurt.identificatie": { type: "string", description: "Buurt-identificatie (bijv. '03630980000386') — gebruik ams_resolve_location om dit op te zoeken" },
       containerEigenaarschap: { type: "string", description: "Eigenaarschap van de container, bijv. 'Eigendom', 'Huur'" },
       containerKleur: { type: "string", description: "Kleur van de container" },
       ...nearRadiusProps,
