@@ -8,10 +8,7 @@ export const bodemToolDefinitions: readonly ToolDef[] = [
       "Gebruik nearLat+nearLon+radiusMeters om onderzoeken bij een specifiek adres te vinden.",
     ].join(" "),
     extraProps: {
-      straatnaam: { type: "string", description: "Straatnaam van de onderzoekslocatie" },
-      gbdBuurtCode: { type: "string", description: "CBS-buurtcode (bijv. 'MD01') — gebruik ams_resolve_location om op te zoeken" },
       eindoordeel: { type: "string", description: "Verontreinigingsoordeel: '>I' (interventiewaarde), '>S' (streefwaarde), '>T' (tussenwaarde), 'Schoon'" },
-      bagPandId: { type: "string", description: "BAG-pandidentificatie om onderzoeken bij een specifiek pand te vinden" },
       "rapportdatum[gte]": { type: "string", description: "Rapportdatum vanaf (YYYY-MM-DD)" },
       "rapportdatum[lte]": { type: "string", description: "Rapportdatum tot (YYYY-MM-DD)" },
       ...nearRadiusProps,

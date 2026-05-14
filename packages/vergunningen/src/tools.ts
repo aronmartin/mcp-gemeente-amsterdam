@@ -21,8 +21,6 @@ export const vergunningenToolDefinitions: readonly ToolDef[] = [
       "startdatum[gte]": { type: "string", description: "Startdatum vanaf (YYYY-MM-DD)" },
       "startdatum[lte]": { type: "string", description: "Startdatum tot (YYYY-MM-DD)" },
       "einddatum[gte]": { type: "string", description: "Einddatum vanaf (YYYY-MM-DD)" },
-      gbdStadsdeelNaam: { type: "string", description: "Naam van het stadsdeel, bijv. 'Centrum', 'West'" },
-      gbdWijkNaam: { type: "string", description: "Naam van de wijk" },
     },
   }),
   listTool({

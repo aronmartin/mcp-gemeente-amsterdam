@@ -106,7 +106,7 @@ export async function resolveLocation(params: {
   let stadsdeelResult: ResolvedLocation["stadsdeel"] = null;
 
   if (cbsCode) {
-    const buurtPage = await defaultClient.list<BuurtRaw>("gebieden", "buurten", { code: cbsCode, page_size: 1 });
+    const buurtPage = await defaultClient.list<BuurtRaw>("gebieden", "buurten", { code: cbsCode, page_size: 1, _expand: true });
     const buurt = Object.values(buurtPage._embedded ?? {}).flat()[0];
     if (buurt) {
       buurtResult = { naam: buurt.naam, code: buurt.code, cbsCode, identificatie: buurt.identificatie };
@@ -114,6 +114,7 @@ export async function resolveLocation(params: {
         const wijkPage = await defaultClient.list<WijkRaw>("gebieden", "wijken", {
           code: buurt.ligtInWijk.code,
           page_size: 1,
+          _expand: true,
         });
         const wijk = Object.values(wijkPage._embedded ?? {}).flat()[0];
         if (wijk) {
