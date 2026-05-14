@@ -3,7 +3,7 @@ import {
   listExplosieven, listOntplofbareOorlogsresten, listLeidingen,
 } from "./client.js";
 import { bodemToolDefinitions } from "./tools.js";
-import { applyNearFilter, buildBboxParam, type QueryParams } from "@amsterdam-mcp/core";
+import { applyNearFilter, type QueryParams } from "@amsterdam-mcp/core";
 
 export { bodemToolDefinitions };
 export * from "./client.js";
@@ -18,7 +18,6 @@ export async function handleBodemTool(
       const params = rest as QueryParams;
       if (nearLat !== undefined && nearLon !== undefined) {
         const radius = (radiusMeters as number) ?? 500;
-        params["geometrie[within_bbox]"] = buildBboxParam(nearLat as number, nearLon as number, radius);
         params.page_size = params.page_size ?? 1000;
         const page = await listBodemonderzoeken(params);
         return applyNearFilter(page as Parameters<typeof applyNearFilter>[0], nearLat as number, nearLon as number, radius);
