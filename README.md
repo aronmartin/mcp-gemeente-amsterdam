@@ -42,7 +42,11 @@ Once connected to any MCP-compatible AI assistant, you can ask questions about A
 
 ## Install via .mcpb (recommended)
 
-Download the latest `.mcpb` from [GitHub Releases](https://github.com/aronmartin/mcp-gemeente-amsterdam/releases/latest) and open it in Claude Desktop or another MCP client for one-click installation. The client will optionally prompt for an API key.
+**[Download mcp-gemeente-amsterdam.mcpb](https://github.com/aronmartin/mcp-gemeente-amsterdam/releases/latest/download/mcp-gemeente-amsterdam.mcpb)**
+
+1. Download the `.mcpb` file using the link above
+2. Open it — your MCP client (e.g. Claude Desktop) will handle the installation
+3. Enter your API key when prompted (see [API Key](#api-key) below)
 
 ## API Key
 
