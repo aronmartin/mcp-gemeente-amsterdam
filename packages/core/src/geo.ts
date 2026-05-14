@@ -1,4 +1,4 @@
-import type { DsoPage } from "./client.js";
+import type { AmsClient, DsoPage, QueryParams } from "./client.js";
 
 // Linear approximation anchored at Amsterdam Centraal.
 // Accurate to ~30m within Amsterdam; sufficient for neighbourhood-level queries.
@@ -76,7 +76,8 @@ export function applyNearFilter<T extends Record<string, unknown>>(
   const filtered: Record<string, (T & { _distanceMeters?: number })[]> = {};
   for (const [key, items] of Object.entries(page._embedded ?? {})) {
     const annotated = (items as T[]).map((item): T & { _distanceMeters?: number } => {
-      const centroid = geomToCentroid(item.geometrie);
+      // Some datasets use 'geometry' (without 'e'), e.g. bodem/grond
+      const centroid = geomToCentroid(item.geometrie ?? item.geometry);
       if (!centroid) return { ...item };
       return { ...item, _distanceMeters: Math.round(haversineMeters(nearLat, nearLon, centroid.lat, centroid.lon)) };
     });
@@ -93,3 +94,32 @@ export const nearRadiusProps = {
   nearLon: { type: "number", description: "WGS84 longitude van het zoekpunt voor locatiefilter" },
   radiusMeters: { type: "number", description: "Zoekradius in meters (standaard 500)" },
 } as const;
+
+/**
+ * Voert een volledige near-radius query uit:
+ *  1. Stuurt een bbox-prefilter (geoParam) naar upstream
+ *  2. Pagineert tot alle resultaten binnen de bbox zijn opgehaald (max 5 pagina's à 1000)
+ *  3. Filtert client-side op de exacte circulaire radius via haversine
+ *  4. Sorteert op afstand en begrenst op `limit` items
+ *  5. Voegt _distanceMeters toe aan elk item
+ */
+export async function fetchNearRadius<T extends Record<string, unknown>>(
+  client: AmsClient,
+  dataset: string,
+  collection: string,
+  geoParam: string,
+  nearLat: number,
+  nearLon: number,
+  radiusMeters: number,
+  baseParams: QueryParams,
+  limit: number,
+): Promise<DsoPage<T & { _distanceMeters?: number }>> {
+  const params = { ...baseParams, [geoParam]: buildIntersectsParam(nearLat, nearLon, radiusMeters) };
+  const allPages = await client.listAll<T>(dataset, collection, params);
+  const filtered = applyNearFilter(allPages, nearLat, nearLon, radiusMeters);
+  const key = Object.keys(filtered._embedded ?? {})[0];
+  if (key && limit > 0) {
+    (filtered._embedded as Record<string, unknown[]>)[key] = filtered._embedded[key].slice(0, limit);
+  }
+  return filtered;
+}

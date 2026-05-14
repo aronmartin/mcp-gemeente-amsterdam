@@ -63,6 +63,44 @@ export class AmsClient {
     }
     return res.json() as Promise<T>;
   }
+
+  /** Fetches all pages for a query, following _links.next up to maxPages.
+   *  Forces page_size=1000 to minimise round-trips. Strips the user-supplied
+   *  `page` param so we always start from page 1.
+   */
+  async listAll<T>(
+    dataset: string,
+    collection: string,
+    params?: QueryParams,
+    maxPages = 5,
+  ): Promise<DsoPage<T>> {
+    const fetchParams: QueryParams = { ...params, page_size: 1000 };
+    delete fetchParams.page;
+
+    const first = await this.list<T>(dataset, collection, fetchParams);
+    const key = Object.keys(first._embedded ?? {})[0];
+    if (!key || !first._links?.next?.href) return first;
+
+    const all: T[] = [...((first._embedded[key] as T[]) ?? [])];
+    let nextHref: string | undefined = first._links.next.href;
+    let n = 1;
+
+    while (nextHref && n < maxPages) {
+      const res = await fetch(nextHref, { headers: this.headers() });
+      if (!res.ok) break;
+      const pg = (await res.json()) as DsoPage<T>;
+      all.push(...((pg._embedded?.[key] as T[]) ?? []));
+      nextHref = pg._links?.next?.href;
+      n++;
+    }
+
+    return {
+      ...first,
+      _embedded: { [key]: all },
+      page: { ...first.page, size: all.length, number: 1 },
+      _links: { self: first._links?.self },
+    };
+  }
 }
 
 export const defaultClient = new AmsClient();

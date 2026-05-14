@@ -1,4 +1,4 @@
-import { defaultClient } from "@amsterdam-mcp/core";
+import { defaultClient, type QueryParams } from "@amsterdam-mcp/core";
 
 const PDOK_REVERSE = "https://api.pdok.nl/bzk/locatieserver/search/v3_1/reverse";
 const PDOK_FREE = "https://api.pdok.nl/bzk/locatieserver/search/v3_1/free";
@@ -61,6 +61,16 @@ type StadsdeelRaw = {
   code?: string;
 };
 
+export type BagInfo = {
+  nummeraanduidingId: string;
+  verblijfsobjectId: string;
+  pandId: string;
+  bouwjaar?: number;
+  oppervlakte?: number;
+  gebruiksdoel?: string;
+  pandstatus?: string;
+};
+
 export type ResolvedLocation = {
   adres: {
     weergavenaam?: string;
@@ -74,6 +84,7 @@ export type ResolvedLocation = {
   buurt: { naam?: string; code?: string; cbsCode?: string; identificatie?: string } | null;
   wijk: { naam?: string; code?: string; identificatie?: string } | null;
   stadsdeel: { naam?: string; code?: string; identificatie?: string } | null;
+  bag: BagInfo | null;
 };
 
 export async function resolveLocation(params: {
@@ -102,8 +113,15 @@ export async function resolveLocation(params: {
     throw new Error("Geef lat+lon op, of postcode+huisnummer");
   }
 
-  // Resolve buurt CBS code via PDOK reverse
-  const buurtDoc = await pdokReverse(lat, lon, "buurt", "buurtnaam,buurtcode");
+  const postcode = adresDoc?.postcode ?? params.postcode;
+  const huisnummer = adresDoc?.huisnummer ?? params.huisnummer;
+
+  // Parallel: resolve buurt via PDOK + BAG lookup via postcode+huisnummer
+  const [buurtDoc, bagResult] = await Promise.all([
+    pdokReverse(lat, lon, "buurt", "buurtnaam,buurtcode"),
+    resolveBag(postcode, huisnummer),
+  ]);
+
   const cbsCode = buurtDoc?.buurtcode?.replace(/^BU\d{4}/, "") ?? null;
 
   let buurtResult: ResolvedLocation["buurt"] = null;
@@ -141,5 +159,54 @@ export async function resolveLocation(params: {
     buurt: buurtResult,
     wijk: wijkResult,
     stadsdeel: stadsdeelResult,
+    bag: bagResult,
   };
+}
+
+type NumRaw = {
+  identificatie: string;
+  adresseertVerblijfsobjectId?: string;
+};
+type VboRaw = {
+  identificatie: string;
+  oppervlakte?: number;
+  gebruiksdoel?: { omschrijving?: string }[];
+  statusOmschrijving?: string;
+  _links?: { ligtInPanden?: { identificatie?: string }[] };
+};
+type PandRaw = {
+  identificatie: string;
+  oorspronkelijkBouwjaar?: number;
+  statusOmschrijving?: string;
+};
+
+async function resolveBag(postcode?: string, huisnummer?: number): Promise<BagInfo | null> {
+  if (!postcode || huisnummer === undefined) return null;
+  try {
+    const numPage = await defaultClient.list<NumRaw>("bag", "nummeraanduidingen", {
+      postcode,
+      huisnummer,
+      page_size: 1,
+    } as QueryParams);
+    const num = Object.values(numPage._embedded ?? {}).flat()[0];
+    if (!num?.adresseertVerblijfsobjectId) return null;
+
+    const vbo = await defaultClient.get<VboRaw>("bag", "verblijfsobjecten", num.adresseertVerblijfsobjectId);
+    const pandId = vbo._links?.ligtInPanden?.[0]?.identificatie;
+    if (!pandId) return null;
+
+    const pand = await defaultClient.get<PandRaw>("bag", "panden", pandId);
+
+    return {
+      nummeraanduidingId: num.identificatie,
+      verblijfsobjectId: vbo.identificatie,
+      pandId,
+      bouwjaar: pand.oorspronkelijkBouwjaar,
+      oppervlakte: vbo.oppervlakte,
+      gebruiksdoel: vbo.gebruiksdoel?.map(g => g.omschrijving).filter(Boolean).join(", "),
+      pandstatus: pand.statusOmschrijving ?? vbo.statusOmschrijving,
+    };
+  } catch {
+    return null;
+  }
 }

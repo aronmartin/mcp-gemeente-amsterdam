@@ -1,6 +1,6 @@
 import { listMonumenten, getMonument, listBeschermdeStadsgezichten, listCanon } from "./client.js";
 import { erfgoedToolDefinitions } from "./tools.js";
-import { applyNearFilter, buildIntersectsParam, type QueryParams } from "@amsterdam-mcp/core";
+import { defaultClient, fetchNearRadius, type QueryParams } from "@amsterdam-mcp/core";
 
 export { erfgoedToolDefinitions };
 export * from "./client.js";
@@ -11,15 +11,17 @@ export async function handleErfgoedTool(
 ): Promise<unknown> {
   switch (toolName) {
     case "ams_monumenten_list": {
-      const { nearLat, nearLon, radiusMeters, ...rest } = args;
-      const params = rest as QueryParams;
+      const { nearLat, nearLon, radiusMeters, page_size, page: _page, bagPandId, ...rest } = args;
+      // Translate bagPandId alias to upstream field name
+      if (bagPandId) rest["betreftBagPand.identificatie"] = bagPandId;
       if (nearLat !== undefined && nearLon !== undefined) {
-        const radius = (radiusMeters as number) ?? 500;
-        params["geometrie[intersects]"] = buildIntersectsParam(nearLat as number, nearLon as number, radius);
-        const page = await listMonumenten(params);
-        return applyNearFilter(page as Parameters<typeof applyNearFilter>[0], nearLat as number, nearLon as number, radius);
+        return fetchNearRadius(
+          defaultClient, "monumenten", "monumenten", "geometrie[intersects]",
+          nearLat as number, nearLon as number, (radiusMeters as number) ?? 500,
+          rest as QueryParams, (page_size as number) ?? 20,
+        );
       }
-      return listMonumenten(params);
+      return listMonumenten(rest as QueryParams);
     }
     case "ams_monumenten_get": return getMonument(args.id as string);
     case "ams_beschermde_stadsgezichten_list": return listBeschermdeStadsgezichten(args as QueryParams);
