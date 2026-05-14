@@ -117,7 +117,6 @@ claude mcp add amsterdam node /path/to/mcp-gemeente-amsterdam/apps/server/dist/i
 | `pnpm bundle` | Bundles the server to `dist/ncc/` (ncc, standalone) |
 | `pnpm mcpb` | `build` + `bundle` + `mcpb pack` → `mcp-gemeente-amsterdam.mcpb` |
 | `pnpm dev` | Starts all packages in watch mode |
-| `pnpm release` | Interactive version bump and release |
 
 ## Adding a new package
 
@@ -126,20 +125,3 @@ claude mcp add amsterdam node /path/to/mcp-gemeente-amsterdam/apps/server/dist/i
 3. Export `xxxToolDefinitions` and `handleXxxTool`
 4. Add the package as a dependency in `apps/server/package.json`
 5. Import and register the bundle in `apps/server/src/register-tools.ts`
-
-## Creating a release
-
-Push a version tag to trigger an automated release:
-
-```bash
-pnpm release
-```
-
-Or manually:
-
-```bash
-git tag v1.0.0
-git push origin v1.0.0
-```
-
-GitHub Actions will build the `.mcpb` and upload it as a release asset.

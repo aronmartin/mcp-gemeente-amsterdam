@@ -10,7 +10,7 @@
     "bundle": "ncc build apps/server/dist/index.js -o dist/ncc -q",
     "mcpb": "pnpm build && pnpm bundle && mcpb pack",
     "test": "turbo test",
-    "release": "bash scripts/release.sh"
+    "prepare": "git config core.hooksPath .githooks"
   },
   "devDependencies": {
     "@anthropic-ai/mcpb": "latest",

@@ -2,8 +2,7 @@ name: Release
 
 on:
   push:
-    tags:
-      - "v*"
+    branches: [main]
 
 env:
   FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
@@ -16,6 +15,8 @@ jobs:
 
     steps:
       - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
 
       - uses: pnpm/action-setup@v4
 
@@ -24,12 +25,89 @@ jobs:
           node-version: "22"
           cache: "pnpm"
 
-      - run: pnpm install --frozen-lockfile
+      - name: Determine version bump
+        id: version
+        run: |
+          # Get last tag, default to v0.0.0 if none exists
+          LAST_TAG=$(git describe --tags --abbrev=0 2>/dev/null || echo "v0.0.0")
+          echo "Last tag: $LAST_TAG"
 
-      - run: pnpm mcpb
+          # Get commits since last tag
+          COMMITS=$(git log "${LAST_TAG}..HEAD" --pretty=format:"%s" 2>/dev/null || git log --pretty=format:"%s")
+
+          # Determine bump type from conventional commits
+          BUMP="none"
+
+          if echo "$COMMITS" | grep -qE '^(feat|fix|refactor|perf|chore|docs|style|test|ci|build|revert)(\([^)]+\))?!:|^BREAKING CHANGE:'; then
+            BUMP="major"
+          elif echo "$COMMITS" | grep -qE '^feat(\([^)]+\))?:'; then
+            BUMP="minor"
+          elif echo "$COMMITS" | grep -qE '^(fix|perf|refactor)(\([^)]+\))?:'; then
+            BUMP="patch"
+          fi
+
+          echo "Bump type: $BUMP"
+
+          if [ "$BUMP" = "none" ]; then
+            echo "skip=true" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+
+          echo "skip=false" >> "$GITHUB_OUTPUT"
+
+          # Parse current version from manifest.json
+          CURRENT=$(node -p "require('./manifest.json').version")
+          IFS='.' read -r MAJOR MINOR PATCH <<< "$CURRENT"
+
+          case "$BUMP" in
+            major) NEW="$((MAJOR + 1)).0.0" ;;
+            minor) NEW="$MAJOR.$((MINOR + 1)).0" ;;
+            patch) NEW="$MAJOR.$MINOR.$((PATCH + 1))" ;;
+          esac
+
+          echo "New version: $NEW"
+          echo "new_version=$NEW" >> "$GITHUB_OUTPUT"
+          echo "tag=v$NEW" >> "$GITHUB_OUTPUT"
+
+      - name: Update version files
+        if: steps.version.outputs.skip != 'true'
+        run: |
+          NEW="${{ steps.version.outputs.new_version }}"
+
+          node -e "
+            const fs = require('fs');
+            const m = JSON.parse(fs.readFileSync('manifest.json', 'utf8'));
+            m.version = '$NEW';
+            fs.writeFileSync('manifest.json', JSON.stringify(m, null, 2) + '\n');
+          "
+
+          node -e "
+            const fs = require('fs');
+            const p = JSON.parse(fs.readFileSync('apps/server/package.json', 'utf8'));
+            p.version = '$NEW';
+            fs.writeFileSync('apps/server/package.json', JSON.stringify(p, null, 2) + '\n');
+          "
+
+      - name: Commit and tag
+        if: steps.version.outputs.skip != 'true'
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add manifest.json apps/server/package.json
+          git commit -m "chore: release ${{ steps.version.outputs.tag }}"
+          git tag "${{ steps.version.outputs.tag }}"
+          git push origin main "${{ steps.version.outputs.tag }}"
+
+      - name: Build .mcpb
+        if: steps.version.outputs.skip != 'true'
+        run: |
+          pnpm install --frozen-lockfile
+          pnpm mcpb
 
       - name: Create GitHub Release
+        if: steps.version.outputs.skip != 'true'
         uses: softprops/action-gh-release@v2
         with:
+          tag_name: ${{ steps.version.outputs.tag }}
           files: "*.mcpb"
           generate_release_notes: true
