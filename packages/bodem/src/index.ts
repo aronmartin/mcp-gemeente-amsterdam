@@ -3,7 +3,7 @@ import {
   listExplosieven, listOntplofbareOorlogsresten, listLeidingen,
 } from "./client.js";
 import { bodemToolDefinitions } from "./tools.js";
-import type { QueryParams } from "@amsterdam-mcp/core";
+import { applyNearFilter, type QueryParams } from "@amsterdam-mcp/core";
 
 export { bodemToolDefinitions };
 export * from "./client.js";
@@ -12,13 +12,22 @@ export async function handleBodemTool(
   toolName: string,
   args: Record<string, unknown>
 ): Promise<unknown> {
-  const p = args as QueryParams;
   switch (toolName) {
-    case "ams_bodemonderzoeken_list": return listBodemonderzoeken(p);
-    case "ams_historische_bodeminformatie_list": return listHistorischeBodeminfo(p);
-    case "ams_explosieven_list": return listExplosieven(p);
-    case "ams_ontplofbare_oorlogsresten_list": return listOntplofbareOorlogsresten(p);
-    case "ams_leidingen_list": return listLeidingen(p);
+    case "ams_bodemonderzoeken_list": {
+      const { nearLat, nearLon, radiusMeters, ...rest } = args;
+      const params = rest as QueryParams;
+      if (nearLat !== undefined && nearLon !== undefined) {
+        const radius = (radiusMeters as number) ?? 500;
+        params.page_size = params.page_size ?? 1000;
+        const page = await listBodemonderzoeken(params);
+        return applyNearFilter(page as Parameters<typeof applyNearFilter>[0], nearLat as number, nearLon as number, radius);
+      }
+      return listBodemonderzoeken(params);
+    }
+    case "ams_historische_bodeminformatie_list": return listHistorischeBodeminfo(args as QueryParams);
+    case "ams_explosieven_list": return listExplosieven(args as QueryParams);
+    case "ams_ontplofbare_oorlogsresten_list": return listOntplofbareOorlogsresten(args as QueryParams);
+    case "ams_leidingen_list": return listLeidingen(args as QueryParams);
     default: throw new Error(`Onbekende bodem tool: ${toolName}`);
   }
 }

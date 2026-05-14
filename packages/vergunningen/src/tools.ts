@@ -11,7 +11,11 @@ export const vergunningenToolDefinitions: readonly ToolDef[] = [
   }),
   listTool({
     name: "ams_evenementen_list",
-    description: "Zoek vergunde evenementen in Amsterdam op naam of datum.",
+    description: [
+      "Zoek vergunde evenementen in Amsterdam op naam, datum of gebied.",
+      "Waarschuwing: de upstream evenementen-feed bevat mogelijk verouderde data (laatste bekende events zijn uit 2021).",
+      "Als er 0 resultaten zijn bij een datumfilter in 2025/2026 is de dataset waarschijnlijk niet meer actueel.",
+    ].join(" "),
     extraProps: {
       titel: { type: "string", description: "Titel van het evenement" },
       "startdatum[gte]": { type: "string", description: "Startdatum vanaf (YYYY-MM-DD)" },

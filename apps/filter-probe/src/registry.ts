@@ -18,8 +18,8 @@ import { waterToolDefinitions } from "@amsterdam-mcp/water";
 import { winkelgebiedenToolDefinitions } from "@amsterdam-mcp/winkelgebieden";
 import { wiorToolDefinitions } from "@amsterdam-mcp/wior";
 
-// Base params added by listTool() — skip these during probing
-const BASE_PARAMS = new Set(["page", "page_size", "_sort"]);
+// Params to skip: base listTool() params + client-side near-radius props (handled by applyNearFilter, never sent upstream)
+const BASE_PARAMS = new Set(["page", "page_size", "_sort", "nearLat", "nearLon", "radiusMeters"]);
 
 // Maps list tool name → upstream dataset/collection path + source file for patching
 const ENDPOINT_MAP: Record<string, { dataset: string; collection: string; toolsFile: string }> = {

@@ -1,14 +1,19 @@
-import { listTool, getTool, type ToolDef } from "@amsterdam-mcp/core";
+import { listTool, getTool, type ToolDef, nearRadiusProps } from "@amsterdam-mcp/core";
 
 export const afvalToolDefinitions: readonly ToolDef[] = [
   listTool({
     name: "ams_afvalcontainers_list",
-    description: "Zoek afvalcontainers op fractie, eigenaarschap of buurt. Gebruik gbdBuurtId voor locatiefiltering (identificatie uit de gebieden API).",
+    description: [
+      "Zoek afvalcontainers op fractie, eigenaarschap of buurt.",
+      "Geldige fractieOmschrijving-waarden: 'Glas', 'Papier', 'Restafval', 'Textiel', 'Plastic', 'Brood', 'GFT'.",
+      "Gebruik nearLat+nearLon+radiusMeters om containers in de buurt van een punt te vinden (sorteert op afstand oplopend, voegt _distanceMeters toe).",
+    ].join(" "),
     extraProps: {
-      fractieOmschrijving: { type: "string", description: "Afvalfractie, bijv. 'Glas', 'Papier', 'Restafval', 'Textiel'" },
-      gbdBuurtId: { type: "string", description: "Buurt-identificatie (bijv. '03630980000386') — gebruik de gebieden API om dit op te zoeken" },
+      fractieOmschrijving: { type: "string", description: "Afvalfractie: 'Glas', 'Papier', 'Restafval', 'Textiel', 'Plastic', 'Brood', 'GFT'" },
+      gbdBuurtId: { type: "string", description: "Buurt-identificatie (bijv. '03630980000386') — gebruik ams_resolve_location om dit op te zoeken" },
       containerEigenaarschap: { type: "string", description: "Eigenaarschap van de container, bijv. 'Eigendom', 'Huur'" },
       containerKleur: { type: "string", description: "Kleur van de container" },
+      ...nearRadiusProps,
     },
   }),
   getTool({

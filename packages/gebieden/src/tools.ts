@@ -1,4 +1,4 @@
-import { listTool, getTool, type ToolDef } from "@amsterdam-mcp/core";
+import { listTool, getTool, type ToolDef, type PropSchema } from "@amsterdam-mcp/core";
 
 export const gebiedenToolDefinitions: readonly ToolDef[] = [
   listTool({
@@ -47,4 +47,24 @@ export const gebiedenToolDefinitions: readonly ToolDef[] = [
       naam: { type: "string", description: "Naam van het grootstedelijk gebied" },
     },
   }),
+  {
+    name: "ams_resolve_location",
+    description: [
+      "Resolves an address or coordinates to the containing Amsterdam neighbourhood (buurt), district (wijk), and borough (stadsdeel) in a single call.",
+      "Accepts either lat+lon (WGS84) or postcode+huisnummer.",
+      "Returns: adres (address details with coordinates), buurt (neighbourhood with CBS code), wijk (district), stadsdeel (borough).",
+      "Use this before calling any tool that accepts gbdBuurtCode, gbdWijkNaam, or gbdStadsdeelNaam filters.",
+    ].join(" "),
+    parameters: {
+      type: "object" as const,
+      properties: {
+        lat: { type: "number", description: "WGS84 latitude" } as PropSchema,
+        lon: { type: "number", description: "WGS84 longitude" } as PropSchema,
+        postcode: { type: "string", description: "Postcode (bijv. '1017BN')" } as PropSchema,
+        huisnummer: { type: "number", description: "Huisnummer" } as PropSchema,
+        huisletter: { type: "string", description: "Huisletter (optioneel)" } as PropSchema,
+      },
+      required: [] as const,
+    },
+  },
 ] as const;

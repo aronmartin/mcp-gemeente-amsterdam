@@ -25,28 +25,28 @@ Once connected to any MCP-compatible AI assistant, you can ask questions about A
 - "Give me an overview of all boroughs in Amsterdam."
 
 **Monuments & heritage**
-- "Which monuments are located in the Jordaan?"
-- "Is this building a protected city view?"
+- "Which monuments are located in the Jordaan neighbourhood?"
+- "List all protected city views in Amsterdam."
 
 **Waste & recycling**
-- "Where is the nearest glass container to Leidseplein?"
-- "When is paper waste collected at this address?"
+- "Where is the nearest glass container to Leidseplein? (lat: 52.3641, lon: 4.8824)"
+- "When is paper waste collected at postcode 1017BN, huisnummer 1?"
 
 **Parking & traffic**
-- "Where can I park near Centraal Station?"
-- "Is my address within a low-emission zone?"
+- "Where can I park near Centraal Station? (lat: 52.3791, lon: 4.9003)"
+- "What low-emission zones exist in Amsterdam and when did they start?"
 
-**Permits & events**
-- "Which events have a permit in the city centre this month?"
-- "Are there active excavation works near this address?"
+**Permits & excavation**
+- "Are there active excavation works near this address? (lat: 52.37, lon: 4.89)"
+- "Which housing-conversion permits have been issued in the West borough?"
 
 **Sustainability & energy**
 - "Is this street part of a gas-free zone?"
 - "What is the energy consumption in this neighbourhood?"
 
 **Property**
-- "What is the WOZ value of this address?"
-- "Are there known soil contamination reports for this plot?"
+- "What is the property type and use code for this address (WOZ)?"
+- "Are there known soil contamination reports near this plot? (lat: 52.37, lon: 4.89)"
 
 ## API Key
 

@@ -1,15 +1,21 @@
-import { listTool, getTool, type ToolDef } from "@amsterdam-mcp/core";
+import { listTool, getTool, type ToolDef, nearRadiusProps } from "@amsterdam-mcp/core";
 
 export const erfgoedToolDefinitions: readonly ToolDef[] = [
   listTool({
     name: "ams_monumenten_list",
-    description: "Zoek Amsterdamse monumenten op naam, functie of bouwjaar.",
+    description: [
+      "Zoek Amsterdamse monumenten (monuments, heritage, listed buildings) op naam, adres of bouwjaar.",
+      "Gebruik adressering[like] voor gedeeltelijke straatnaam/adres-matching.",
+      "Gebruik nearLat+nearLon+radiusMeters om monumenten in de buurt van een punt te vinden (client-side filtering op geometrie).",
+    ].join(" "),
     extraProps: {
-      naam: { type: "string", description: "Naam van het monument" },
-      "naam[like]": { type: "string", description: "Naam bevat (wildcard)" },
-      adressering: { type: "string", description: "Adres of straatnaam, bijv. 'Leidseplein'" },
-      jaarBeginVan: { type: "number", description: "Bouwjaar (exacte overeenkomst)" },
+      naam: { type: "string", description: "Naam van het monument (exact)" },
+      "naam[like]": { type: "string", description: "Naam bevat (wildcard, hoofdletterongevoelig)" },
+      adressering: { type: "string", description: "Volledig adres (exact-match). Gebruik adressering[like] voor gedeeltelijke match." },
+      "adressering[like]": { type: "string", description: "Adres of straatnaam bevat (wildcard), bijv. 'Bloemgracht' of 'Jordaan'" },
       oorspronkelijkeFunctie: { type: "string", description: "Oorspronkelijke functie, bijv. 'Woning', 'Kerk'" },
+      jaarBeginVan: { type: "number", description: "Bouwjaar (exacte overeenkomst). Opmerking: range-filters [gte]/[lte] worden niet ondersteund door upstream." },
+      ...nearRadiusProps,
     },
   }),
   getTool({
