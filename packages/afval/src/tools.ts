@@ -3,11 +3,12 @@ import { listTool, getTool, type ToolDef } from "@amsterdam-mcp/core";
 export const afvalToolDefinitions: readonly ToolDef[] = [
   listTool({
     name: "ams_afvalcontainers_list",
-    description: "Zoek afvalcontainers op type (restafval, glas, papier etc.), buurt of bbox.",
+    description: "Zoek afvalcontainers op fractie, eigenaarschap of buurt. Gebruik gbdBuurtId voor locatiefiltering (identificatie uit de gebieden API).",
     extraProps: {
-      containerEigenaarschap: { type: "string", description: "Eigenaarschap, bijv. 'Gemeente Amsterdam'" },
+      fractieOmschrijving: { type: "string", description: "Afvalfractie, bijv. 'Glas', 'Papier', 'Restafval', 'Textiel'" },
+      gbdBuurtId: { type: "string", description: "Buurt-identificatie (bijv. '03630980000386') — gebruik de gebieden API om dit op te zoeken" },
+      containerEigenaarschap: { type: "string", description: "Eigenaarschap van de container, bijv. 'Eigendom', 'Huur'" },
       containerKleur: { type: "string", description: "Kleur van de container" },
-      "ligtInBuurt.naam": { type: "string", description: "Naam van de buurt" },
     },
   }),
   getTool({

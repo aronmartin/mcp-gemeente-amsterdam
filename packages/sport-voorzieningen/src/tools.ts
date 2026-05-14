@@ -3,7 +3,7 @@ import { listTool, type ToolDef } from "@amsterdam-mcp/core";
 export const sportVoorzieningenToolDefinitions: readonly ToolDef[] = [
   listTool({
     name: "ams_sport_list",
-    description: "Geeft openbare sportplekken terug (sportparken, zwembaden, sportscholen, etc.) op type of bbox.",
+    description: "Geeft openbare sportplekken terug (sportparken, zwembaden, sportscholen, etc.) op type.",
     extraProps: {
       naam: { type: "string", description: "Naam van de sportplek" },
       sportvoorziening: { type: "string", description: "Type sportvoorziening" },
@@ -24,7 +24,6 @@ export const sportVoorzieningenToolDefinitions: readonly ToolDef[] = [
     name: "ams_schoolgebouwen_list",
     description: "Geeft schoolgebouwen terug met adres en BRIN-nummer.",
     extraProps: {
-      naam: { type: "string", description: "Naam van de school" },
       adresStraat: { type: "string", description: "Straatnaam" },
       adresPostcode: { type: "string", description: "Postcode" },
       code: { type: "string", description: "BRIN-code of schoolcode" },

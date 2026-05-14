@@ -3,7 +3,7 @@ import { listTool, getTool, type ToolDef } from "@amsterdam-mcp/core";
 export const openbareRuimteToolDefinitions: readonly ToolDef[] = [
   listTool({
     name: "ams_bgt_list",
-    description: "Geeft BGT-wegdelen (Basisregistratie Grootschalige Topografie) terug op type of bbox.",
+    description: "Geeft BGT-wegdelen (Basisregistratie Grootschalige Topografie) terug op type.",
     extraProps: {
       bgtFunctie: { type: "string", description: "BGT-functie van het wegdeel" },
       plusFunctie: { type: "string", description: "Plus-functie van het wegdeel" },
@@ -14,14 +14,15 @@ export const openbareRuimteToolDefinitions: readonly ToolDef[] = [
     name: "ams_nap_peilmerken_list",
     description: "Geeft NAP-peilmerken terug: officiële hoogtemeetpunten ten opzichte van NAP.",
     extraProps: {
-      type: { type: "string", description: "Type peilmerk" },
+      merkCode: { type: "string", description: "Code van het peilmerk" },
+      statusCode: { type: "number", description: "Status als getal, bijv. 1 (actief), 2 (vervallen)" },
     },
   }),
   listTool({
     name: "ams_meetbouten_list",
     description: "Geeft meetbouten terug: bouts in de grond voor zakking-monitoring van de bodem.",
     extraProps: {
-      statusCode: { type: "string", description: "Status van de meetbout" },
+      statusCode: { type: "number", description: "Status als getal, bijv. 1 (actief), 2 (vervallen)" },
     },
   }),
   getTool({
@@ -43,7 +44,8 @@ export const openbareRuimteToolDefinitions: readonly ToolDef[] = [
     name: "ams_bouwstroompunten_list",
     description: "Geeft bouwstroompunten terug: aansluitpunten voor tijdelijke stroomafname bij bouwprojecten.",
     extraProps: {
-      aansluitingType: { type: "string", description: "Type aansluiting" },
+      primaireFunctie: { type: "string", description: "Primaire functie van het bouwstroompunt" },
+      toegangswijze: { type: "string", description: "Toegangswijze van het bouwstroompunt" },
     },
   }),
   listTool({

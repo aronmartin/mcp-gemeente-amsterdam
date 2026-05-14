@@ -3,7 +3,7 @@ import { listTool, type ToolDef } from "@amsterdam-mcp/core";
 export const vastgoedToolDefinitions: readonly ToolDef[] = [
   listTool({
     name: "ams_woz_list",
-    description: "Geeft WOZ-objecten terug met vastgestelde waarde en peildatum.",
+    description: "Geeft WOZ-objecten terug met gebruikscode, soortobject en geldigheidsdatum.",
     extraProps: {
       wozobjectnummer: { type: "string", description: "WOZ-objectnummer" },
     },
@@ -44,7 +44,6 @@ export const vastgoedToolDefinitions: readonly ToolDef[] = [
     description: "Geeft precariobelastingzones terug (belasting voor gebruik gemeentegrond, bijv. terrassen).",
     extraProps: {
       categorie: { type: "string", description: "Categorie precario" },
-      jaar: { type: "number", description: "Jaar" },
       stadsdeel: { type: "string", description: "Stadsdeel" },
       gebied: { type: "string", description: "Gebied" },
     },

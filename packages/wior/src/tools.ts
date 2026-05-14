@@ -20,8 +20,8 @@ export const wiorToolDefinitions: readonly ToolDef[] = [
     name: "ams_storingsmeldingen_list",
     description: "Geeft storingsmeldingen van openbare verlichting en klokken terug.",
     extraProps: {
-      storingstatus: { type: "string", description: "Status van de storing" },
-      meldingstatus: { type: "string", description: "Status van de melding" },
+      storingstatus: { type: "number", description: "Status van de storing als getal, bijv. 0 (gemeld), 1 (in behandeling), 2 (opgelost)" },
+      meldingstatus: { type: "number", description: "Status van de melding als getal, bijv. 0 (open), 1 (gesloten)" },
       objecttype: { type: "string", description: "Type object (bijv. 'Armatuur', 'Mast')" },
       objectnummer: { type: "string", description: "Objectnummer" },
     },

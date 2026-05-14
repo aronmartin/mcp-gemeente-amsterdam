@@ -3,7 +3,7 @@ import { listTool, type ToolDef } from "@amsterdam-mcp/core";
 export const bodemToolDefinitions: readonly ToolDef[] = [
   listTool({
     name: "ams_bodemonderzoeken_list",
-    description: "Geeft bodemonderzoeken terug op bbox. Toont locaties waar bodemonderzoek is gedaan.",
+    description: "Geeft bodemonderzoeken terug. Toont locaties waar bodemonderzoek is gedaan.",
     extraProps: {},
   }),
   listTool({
@@ -23,7 +23,7 @@ export const bodemToolDefinitions: readonly ToolDef[] = [
   }),
   listTool({
     name: "ams_leidingen_list",
-    description: "Geeft Waternet riool- en leidingeninfrastructuur terug op bbox.",
+    description: "Geeft Waternet riool- en leidingeninfrastructuur terug.",
     extraProps: {},
   }),
 ] as const;

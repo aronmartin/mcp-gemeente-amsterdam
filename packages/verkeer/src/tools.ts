@@ -3,7 +3,7 @@ import { listTool, type ToolDef } from "@amsterdam-mcp/core";
 export const verkeerToolDefinitions: readonly ToolDef[] = [
   listTool({
     name: "ams_parkeervakken_list",
-    description: "Geeft parkeervakken terug op type of bbox (straatparkeren, betaald, vergunning etc.).",
+    description: "Geeft parkeervakken terug op type (straatparkeren, betaald, vergunning etc.).",
     extraProps: {
       eType: { type: "string", description: "E-type code van het parkeervak" },
       soort: { type: "string", description: "Soort parkeervak" },
@@ -53,7 +53,7 @@ export const verkeerToolDefinitions: readonly ToolDef[] = [
   }),
   listTool({
     name: "ams_fietspaaltjes_list",
-    description: "Geeft fietspaaltjes en andere toegangsbelemmeringen terug op bbox.",
+    description: "Geeft fietspaaltjes en andere toegangsbelemmeringen terug.",
     extraProps: {
       soortPaaltje: { type: "string", description: "Soort paaltje" },
       soortWeg: { type: "string", description: "Soort weg" },
