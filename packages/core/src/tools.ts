@@ -31,10 +31,6 @@ export function listTool(opts: {
         page: { type: "number", description: "Paginanummer (standaard 1)" },
         page_size: { type: "number", description: "Resultaten per pagina (standaard 20, max 1000)" },
         _sort: { type: "string", description: "Sorteerveld, prefix met - voor aflopend" },
-        _bbox: {
-          type: "string",
-          description: "Geografische bounding box: 'xmin,ymin,xmax,ymax' (WGS84)",
-        },
         ...opts.extraProps,
       },
       required: opts.required ?? ([] as const),

@@ -21,7 +21,7 @@ export const vergunningenToolDefinitions: readonly ToolDef[] = [
   }),
   listTool({
     name: "ams_horeca_list",
-    description: "Zoek horecabedrijven (cafés, restaurants, hotels) op naam, adres of bbox.",
+    description: "Zoek horecabedrijven (cafés, restaurants, hotels) op naam of adres.",
     extraProps: {
       zaaknaam: { type: "string", description: "Naam van het bedrijf" },
       "zaaknaam[like]": { type: "string", description: "Naam bevat (wildcard)" },

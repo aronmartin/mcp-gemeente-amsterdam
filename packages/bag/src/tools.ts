@@ -3,7 +3,7 @@ import { listTool, getTool, type ToolDef } from "@amsterdam-mcp/core";
 export const bagToolDefinitions: readonly ToolDef[] = [
   listTool({
     name: "ams_bag_list_verblijfsobjecten",
-    description: "Zoek verblijfsobjecten (woningen, kantoren, winkels) in Amsterdam via postcode, gebruiksdoel of bbox.",
+    description: "Zoek verblijfsobjecten (woningen, kantoren, winkels) in Amsterdam via postcode of gebruiksdoel.",
     extraProps: {
       postcode: { type: "string", description: "Postcode, bijv. '1012JS'" },
       "heeftHoofdadres.huisnummer": { type: "number", description: "Huisnummer" },
@@ -20,7 +20,7 @@ export const bagToolDefinitions: readonly ToolDef[] = [
   }),
   listTool({
     name: "ams_bag_list_panden",
-    description: "Zoek BAG-panden (gebouwen) op bouwjaar, status of bbox.",
+    description: "Zoek BAG-panden (gebouwen) op bouwjaar of status.",
     extraProps: {
       oorspronkelijkBouwjaar: { type: "number", description: "Bouwjaar" },
       "oorspronkelijkBouwjaar[gte]": { type: "number", description: "Bouwjaar minimaal" },
@@ -62,14 +62,14 @@ export const bagToolDefinitions: readonly ToolDef[] = [
   }),
   listTool({
     name: "ams_bag_list_standplaatsen",
-    description: "Zoek standplaatsen (officiële locaties voor woonwagens) op status of bbox.",
+    description: "Zoek standplaatsen (officiële locaties voor woonwagens) op status.",
     extraProps: {
       statusCode: { type: "string", description: "Status" },
     },
   }),
   listTool({
     name: "ams_bag_list_ligplaatsen",
-    description: "Zoek ligplaatsen (officiële waterlocaties voor woonboten) op status of bbox.",
+    description: "Zoek ligplaatsen (officiële waterlocaties voor woonboten) op status.",
     extraProps: {
       statusCode: { type: "string", description: "Status" },
     },

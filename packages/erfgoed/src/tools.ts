@@ -3,14 +3,14 @@ import { listTool, getTool, type ToolDef } from "@amsterdam-mcp/core";
 export const erfgoedToolDefinitions: readonly ToolDef[] = [
   listTool({
     name: "ams_monumenten_list",
-    description: "Zoek Amsterdamse monumenten op naam, functie, bouwjaar of bbox.",
+    description: "Zoek Amsterdamse monumenten op naam, functie of bouwjaar.",
     extraProps: {
       naam: { type: "string", description: "Naam van het monument" },
       "naam[like]": { type: "string", description: "Naam bevat (wildcard)" },
+      adressering: { type: "string", description: "Adres of straatnaam, bijv. 'Leidseplein'" },
       oorspronkelijkeFunctie: { type: "string", description: "Oorspronkelijke functie, bijv. 'Woning', 'Kerk'" },
       "jaarBeginVan[gte]": { type: "number", description: "Bouwjaar minimaal" },
       "jaarBeginVan[lte]": { type: "number", description: "Bouwjaar maximaal" },
-      "ligtInBuurt.naam": { type: "string", description: "Naam van de buurt" },
     },
   }),
   getTool({

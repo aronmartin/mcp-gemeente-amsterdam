@@ -20,7 +20,7 @@ export const gebiedenToolDefinitions: readonly ToolDef[] = [
   }),
   listTool({
     name: "ams_gebieden_list_buurten",
-    description: "Geeft buurten terug, optioneel gefilterd op wijk of via bbox.",
+    description: "Geeft buurten terug, optioneel gefilterd op naam, code of wijk.",
     extraProps: {
       naam: { type: "string", description: "Naam van de buurt" },
       code: { type: "string", description: "Buurtcode" },

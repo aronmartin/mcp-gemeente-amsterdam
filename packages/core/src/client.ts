@@ -13,10 +13,6 @@ export type QueryParams = {
   _expand?: boolean;
   _expandScope?: string;
   _sort?: string;
-  /** "xmin,ymin,xmax,ymax" in RD of WGS84 */
-  _bbox?: string;
-  /** "lat,lon,radius" */
-  _near?: string;
   [key: string]: unknown;
 };
 

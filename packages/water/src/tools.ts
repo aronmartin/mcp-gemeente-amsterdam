@@ -3,7 +3,7 @@ import { listTool, type ToolDef } from "@amsterdam-mcp/core";
 export const waterToolDefinitions: readonly ToolDef[] = [
   listTool({
     name: "ams_water_list",
-    description: "Geeft binnenwater terug in Amsterdam (grachten, meren, havens) op bbox.",
+    description: "Geeft binnenwater terug in Amsterdam (grachten, meren, havens).",
     extraProps: {},
   }),
   listTool({

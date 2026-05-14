@@ -1,6 +1,6 @@
 import { defaultClient, type DsoPage, type QueryParams } from "@amsterdam-mcp/core";
 
-export type WozObject = { id?: number; wozObjectnummer?: string; waardepeildatum?: string; vastgesteldeWaarde?: number; adres?: string; postcode?: string; geometrie?: unknown };
+export type WozObject = { volgnummer?: number; wozobjectnummer?: string; gebruikCode?: string; gebruikOmschrijving?: string; soortObjectCode?: string; soortObjectOmschrijving?: string; beginGeldigheid?: string; eindGeldigheid?: string };
 export type GemeentelijkVastgoed = { id?: number; naam?: string; gebruik?: string; eigendom?: string; straatnaam?: string; huisnummer?: number; adres?: string; oppervlakte?: number; geometrie?: unknown };
 export type Nieuwbouwplan = { id?: number; naam?: string; fase?: string; typeCode?: string; woningaantal?: number; buurtCode?: string; buurtNaam?: string; wijkCode?: string; wijkNaam?: string; gebiedCode?: string; geometrie?: unknown };
 export type Grex = { id?: number; naam?: string; planstatus?: string; geometrie?: unknown };

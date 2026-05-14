@@ -3,7 +3,7 @@ import { listTool, getTool, type ToolDef } from "@amsterdam-mcp/core";
 export const groenToolDefinitions: readonly ToolDef[] = [
   listTool({
     name: "ams_bomen_list",
-    description: "Zoek bomen in Amsterdam op soort, buurt, aanlegjaar of bbox.",
+    description: "Zoek bomen in Amsterdam op soort, buurt of aanlegjaar.",
     extraProps: {
       soortnaamTop: { type: "string", description: "Hoofdsoort, bijv. 'Plataan', 'Eik', 'Iep'" },
       soortnaamKort: { type: "string", description: "Korte soortnaam" },
