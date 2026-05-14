@@ -6,7 +6,7 @@ MCP server exposing all public APIs from [Gemeente Amsterdam](https://api.data.a
 
 ## What can you do with this?
 
-Once connected to Claude, you can ask questions about Amsterdam in plain language. Some examples:
+Once connected to any MCP-compatible AI assistant, you can ask questions about Amsterdam in plain language. Some examples:
 
 **Buildings & addresses**
 - "What year was the building at Keizersgracht 123 constructed?"
