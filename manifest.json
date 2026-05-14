@@ -2,7 +2,7 @@
   "manifest_version": "0.3",
   "name": "mcp-gemeente-amsterdam",
   "display_name": "Gemeente Amsterdam",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "description": "Toegang tot alle publieke APIs van Gemeente Amsterdam: gebouwen, gebieden, verkeer, afval, erfgoed, vergunningen en meer.",
   "author": {
     "name": "Aron Martin"
