@@ -3,9 +3,16 @@ import { listTool, type ToolDef } from "@amsterdam-mcp/core";
 export const vastgoedToolDefinitions: readonly ToolDef[] = [
   listTool({
     name: "ams_woz_list",
-    description: "Geeft WOZ-objecten terug met gebruikscode, soortobject en geldigheidsdatum.",
+    description: [
+      "Geeft WOZ-objecten terug met gebruikscode, soortobject en geldigheidsdatum.",
+      "Let op: de vastgesteldeWaarde (WOZ-bedrag) is niet beschikbaar in deze publieke API — alleen objecttype en gebruikscode worden ontsloten.",
+      "Filter op bagNummeraanduidingId of postcode+huisnummer om een specifiek adres op te zoeken.",
+    ].join(" "),
     extraProps: {
       wozobjectnummer: { type: "string", description: "WOZ-objectnummer" },
+      bagNummeraanduidingId: { type: "string", description: "BAG-nummeraanduidingidentificatie (gebruik ams_resolve_location of bag tools om dit op te zoeken)" },
+      postcode: { type: "string", description: "Postcode van het adres (bijv. '1017BN')" },
+      huisnummer: { type: "number", description: "Huisnummer" },
     },
   }),
   listTool({

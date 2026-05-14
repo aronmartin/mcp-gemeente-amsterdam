@@ -5,6 +5,7 @@ import {
   listGgwGebieden,
   listGrootstedelijkeGebieden,
 } from "./client.js";
+import { resolveLocation } from "./resolve.js";
 import { gebiedenToolDefinitions } from "./tools.js";
 import type { QueryParams } from "@amsterdam-mcp/core";
 
@@ -23,6 +24,7 @@ export async function handleGebiedenTool(
     case "ams_gebieden_get_buurt": return getBuurt(args.identificatie as string);
     case "ams_gebieden_list_ggwgebieden": return listGgwGebieden(p);
     case "ams_gebieden_list_grootstedelijke_gebieden": return listGrootstedelijkeGebieden(p);
+    case "ams_resolve_location": return resolveLocation(args as Parameters<typeof resolveLocation>[0]);
     default: throw new Error(`Onbekende gebieden tool: ${toolName}`);
   }
 }

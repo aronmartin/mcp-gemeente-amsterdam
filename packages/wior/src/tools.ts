@@ -1,9 +1,12 @@
-import { listTool, type ToolDef } from "@amsterdam-mcp/core";
+import { listTool, type ToolDef, nearRadiusProps } from "@amsterdam-mcp/core";
 
 export const wiorToolDefinitions: readonly ToolDef[] = [
   listTool({
     name: "ams_wior_list",
-    description: "Geeft werkzaamheden in de openbare ruimte terug: geplande en actieve graafwerken, rioleringsprojecten etc.",
+    description: [
+      "Geeft werkzaamheden in de openbare ruimte terug: geplande en actieve graafwerken, rioleringsprojecten etc.",
+      "Gebruik nearLat+nearLon+radiusMeters om graafwerken in de buurt van een punt te vinden (sorteert op afstand, voegt _distanceMeters toe).",
+    ].join(" "),
     extraProps: {
       hoofdstatus: { type: "string", description: "Status, bijv. 'Uitvoering', 'Gepland', 'Gereed'" },
       typeWerkzaamheden: { type: "string", description: "Type werkzaamheid, bijv. 'Vervanging', 'Aanleg'" },
@@ -14,6 +17,7 @@ export const wiorToolDefinitions: readonly ToolDef[] = [
       "datumStartUitvoering[lte]": { type: "string", description: "Startdatum uitvoering tot (YYYY-MM-DD)" },
       "datumEindeUitvoering[gte]": { type: "string", description: "Einddatum uitvoering vanaf (YYYY-MM-DD)" },
       "datumEindeUitvoering[lte]": { type: "string", description: "Einddatum uitvoering tot (YYYY-MM-DD)" },
+      ...nearRadiusProps,
     },
   }),
   listTool({
