@@ -6,7 +6,7 @@ export const erfgoedToolDefinitions: readonly ToolDef[] = [
     description: [
       "Zoek Amsterdamse monumenten (monuments, heritage, listed buildings) op naam, adres of bouwjaar.",
       "Gebruik adressering[like] voor gedeeltelijke straatnaam/adres-matching.",
-      "Gebruik nearLat+nearLon+radiusMeters om monumenten in de buurt van een punt te vinden (client-side filtering op geometrie).",
+      "Gebruik nearLat+nearLon+radiusMeters om monumenten in de buurt van een punt te vinden (sorteert op afstand, voegt _distanceMeters toe).",
     ].join(" "),
     extraProps: {
       naam: { type: "string", description: "Naam van het monument (exact)" },

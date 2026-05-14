@@ -22,34 +22,10 @@ import { analyseToolDefinitions, handleAnalyseTool } from "@amsterdam-mcp/analys
 import { buildZodSchema } from "./json-schema-to-zod.js";
 import type { JsonSchemaProp } from "./types.js";
 import type { ToolDef, DsoPage } from "@amsterdam-mcp/core";
+import { resolveProfile } from "./response-profiles.js";
+import { GEOMETRY_KEYS, geometryToCentroid, shapeItem } from "./shape-response.js";
 
-const GEOMETRY_KEYS = new Set(["geometrie", "geometry", "_geometry", "geoPoint", "geoMultiPoint"]);
 const MAX_RESPONSE_BYTES = 200_000;
-
-// RD New (EPSG:28992) → WGS84 — lineaire benadering verankerd aan Amsterdam Centraal.
-// Nauwkeurig tot ~30m binnen Amsterdam; voldoende voor buurt-level queries.
-// Referentie: RD(121389, 487366) = WGS84(52.378784°, 4.900276°)
-function rdToWgs84(rdX: number, rdY: number): { lat: number; lon: number } {
-  return {
-    lat: Math.round((52.378784 + (rdY - 487366) / 111320) * 1e6) / 1e6,
-    lon: Math.round((4.900276 + (rdX - 121389) / 67886) * 1e6) / 1e6,
-  };
-}
-
-function geometryToCentroid(geom: unknown): { lat: number; lon: number } | null {
-  if (!geom || typeof geom !== "object") return null;
-  const g = geom as { type?: string; coordinates?: unknown };
-  let coords: number[][] = [];
-  if (g.type === "Point") coords = [g.coordinates as number[]];
-  else if (g.type === "Polygon") coords = (g.coordinates as number[][][])[0] ?? [];
-  else if (g.type === "MultiPolygon") coords = (g.coordinates as number[][][][])[0]?.[0] ?? [];
-  else if (g.type === "LineString") coords = g.coordinates as number[][];
-  if (!coords.length) return null;
-  const sumX = coords.reduce((s, c) => s + c[0], 0) / coords.length;
-  const sumY = coords.reduce((s, c) => s + c[1], 0) / coords.length;
-  // RD coordinates are in the range 7000–300000 for x; WGS84 lon is 3–8
-  return sumX > 100 ? rdToWgs84(sumX, sumY) : { lat: Math.round(sumY * 1e6) / 1e6, lon: Math.round(sumX * 1e6) / 1e6 };
-}
 
 function processValue(value: unknown): unknown {
   if (Array.isArray(value)) return value.map(processValue);
@@ -59,7 +35,6 @@ function processValue(value: unknown): unknown {
       if (GEOMETRY_KEYS.has(k)) {
         const centroid = geometryToCentroid(v);
         if (centroid) result["_centroid"] = centroid;
-        // geometry itself is dropped
       } else {
         result[k] = processValue(v);
       }
@@ -69,25 +44,40 @@ function processValue(value: unknown): unknown {
   return value;
 }
 
-function formatResult(raw: unknown): string {
+function formatResult(
+  raw: unknown,
+  toolName: string,
+  detail: "minimal" | "default" | "full",
+  fields?: string,
+): string {
+  const profile = resolveProfile(toolName, detail);
+  const extraFields = new Set(
+    fields ? fields.split(",").map(s => s.trim()).filter(Boolean) : [],
+  );
+
   // Unwrap DSO HAL envelope into a flat structure
   if (raw !== null && typeof raw === "object" && "_embedded" in (raw as object)) {
     const hal = raw as DsoPage<unknown>;
     const embedded = hal._embedded ?? {};
-    const items = Object.values(embedded).flat();
+    const items = Object.values(embedded).flat() as Record<string, unknown>[];
     const clean = {
-      items: processValue(items),
+      items: items.map(item => shapeItem(item, profile, extraFields)),
       pagination: hal.page ?? {},
     };
     const json = JSON.stringify(clean);
     if (json.length > MAX_RESPONSE_BYTES) {
-      const truncated = { ...clean, items: (clean.items as unknown[]).slice(0, 10), truncated: true, note: `Response te groot (${json.length} bytes). Gebruik page_size of filters om resultaten te beperken.` };
+      const truncated = {
+        ...clean,
+        items: clean.items.slice(0, 10),
+        truncated: true,
+        note: `Response te groot (${json.length} bytes). Gebruik page_size of filters om resultaten te beperken.`,
+      };
       return JSON.stringify(truncated, null, 2);
     }
     return JSON.stringify(clean, null, 2);
   }
 
-  // Single-object response
+  // Single-object response — geen profiel toegepast, wel geometry → centroid
   const clean = processValue(raw);
   const json = JSON.stringify(clean, null, 2);
   if (json.length > MAX_RESPONSE_BYTES) {
@@ -120,8 +110,14 @@ function toMcpToolSpec(tool: ToolDef, executeTool: ToolExecutor): RegisteredTool
       required,
     ),
     execute: async (args) => {
-      const result = await executeTool(tool.name, args);
-      return formatResult(result);
+      const { detail = "default", fields, ...upstreamArgs } = args;
+      const result = await executeTool(tool.name, upstreamArgs);
+      return formatResult(
+        result,
+        tool.name,
+        detail as "minimal" | "default" | "full",
+        fields as string | undefined,
+      );
     },
   };
 }
