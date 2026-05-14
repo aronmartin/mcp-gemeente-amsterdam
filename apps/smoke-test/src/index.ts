@@ -1,4 +1,5 @@
 import type { DsoPage } from "@amsterdam-mcp/core";
+import { defaultClient, fetchNearRadius } from "@amsterdam-mcp/core";
 
 import { listPanden, getPand, listVerblijfsobjecten, getVerblijfsobject, listNummeraanduidingen, listOpenbareruimtes, getOpenbareruimte, listWoonplaatsen, listStandplaatsen, listLigplaatsen } from "@amsterdam-mcp/bag";
 import { listAfvalcontainers, getAfvalcontainer, listAfvalwijzer, listRecyclepunten } from "@amsterdam-mcp/afval";
@@ -180,6 +181,54 @@ const tests: Array<() => Promise<TestResult>> = [
   () => check("wior / stroomstoringen (list)",           () => listStroomstoringen({ page_size: 1 })),
 ];
 
+// ── Near-radius integratietests ───────────────────────────────────────────────
+// Zoekpunt: Grachtengordel-West, Amsterdam (52.37640267, 4.88736806)
+// Bekende dataset-dichtheden op dit punt (empirisch vastgesteld):
+//   monumenten   radius=500m  → ≥ 5  (daadwerkelijk ≥ 10)
+//   meetbouten   radius=500m  → ≥ 50 (daadwerkelijk ≥ 150)
+//   kademuren    radius=500m  → ≥ 10 (daadwerkelijk ≥ 19)
+//   bodem/grond  radius=500m  → ≥ 50 (daadwerkelijk ≥ 100, vereist multi-page)
+//   containers   radius=500m  → ≥ 8  (daadwerkelijk ≥ 12)
+const NEAR_LAT = 52.37640267;
+const NEAR_LON = 4.88736806;
+const NEAR_RADIUS = 500;
+
+async function checkNearRadius(
+  name: string,
+  dataset: string,
+  collection: string,
+  geoParam: string,
+  minResults: number,
+): Promise<TestResult> {
+  return check(name, async () => {
+    const result = await fetchNearRadius<Record<string, unknown>>(
+      defaultClient, dataset, collection, geoParam,
+      NEAR_LAT, NEAR_LON, NEAR_RADIUS, {}, 200,
+    );
+    const items = (Object.values(result._embedded ?? {})[0] ?? []) as Array<Record<string, unknown>>;
+    if (items.length < minResults) {
+      throw new Error(`${items.length} resultaten, verwacht ≥${minResults}`);
+    }
+    for (const item of items) {
+      if (item["_distanceMeters"] === undefined) {
+        throw new Error(`_distanceMeters ontbreekt op item ${item["identificatie"] ?? item["id"]}`);
+      }
+      if ((item["_distanceMeters"] as number) > NEAR_RADIUS) {
+        throw new Error(`_distanceMeters ${item["_distanceMeters"]}m > radius ${NEAR_RADIUS}m`);
+      }
+    }
+    return result;
+  });
+}
+
+const nearRadiusTests: Array<() => Promise<TestResult>> = [
+  () => checkNearRadius("near / monumenten (500m)",     "monumenten",         "monumenten",  "geometrie[intersects]",  5),
+  () => checkNearRadius("near / meetbouten (500m)",     "meetbouten",         "meetbouten",  "geometrie[intersects]", 50),
+  () => checkNearRadius("near / kademuren (500m)",      "civieleconstructies","kademuur",    "geometrie[intersects]", 10),
+  () => checkNearRadius("near / bodemonderzoeken (500m)","bodem",             "grond",       "geometry[intersects]",  50),
+  () => checkNearRadius("near / containers (500m)",     "huishoudelijkafval", "container",   "geometrie[intersects]",  8),
+];
+
 function pad(s: string, n: number): string {
   return s.length >= n ? s : s + " ".repeat(n - s.length);
 }
@@ -189,7 +238,7 @@ async function main() {
   console.log("─".repeat(55));
 
   const results: TestResult[] = [];
-  for (const t of tests) {
+  for (const t of [...tests, ...nearRadiusTests]) {
     const r = await t();
     results.push(r);
     const icon = r.ok ? `${GREEN}✓${RESET}` : `${RED}✗${RESET}`;

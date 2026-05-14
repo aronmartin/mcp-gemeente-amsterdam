@@ -10,4 +10,5 @@ export {
   buildIntersectsParam,
   applyNearFilter,
   nearRadiusProps,
+  fetchNearRadius,
 } from "./geo.js";

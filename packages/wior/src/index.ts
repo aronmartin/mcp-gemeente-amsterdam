@@ -1,6 +1,6 @@
 import { listWior, listStoringsmeldingen, listStroomstoringen } from "./client.js";
 import { wiorToolDefinitions } from "./tools.js";
-import { applyNearFilter, buildIntersectsParam, type QueryParams } from "@amsterdam-mcp/core";
+import { defaultClient, fetchNearRadius, type QueryParams } from "@amsterdam-mcp/core";
 
 export { wiorToolDefinitions };
 export * from "./client.js";
@@ -11,15 +11,15 @@ export async function handleWiorTool(
 ): Promise<unknown> {
   switch (toolName) {
     case "ams_wior_list": {
-      const { nearLat, nearLon, radiusMeters, ...rest } = args;
-      const params = rest as QueryParams;
+      const { nearLat, nearLon, radiusMeters, page_size, page: _page, ...rest } = args;
       if (nearLat !== undefined && nearLon !== undefined) {
-        const radius = (radiusMeters as number) ?? 500;
-        params["geometrie[intersects]"] = buildIntersectsParam(nearLat as number, nearLon as number, radius);
-        const page = await listWior(params);
-        return applyNearFilter(page as Parameters<typeof applyNearFilter>[0], nearLat as number, nearLon as number, radius);
+        return fetchNearRadius(
+          defaultClient, "wior", "wior", "geometrie[intersects]",
+          nearLat as number, nearLon as number, (radiusMeters as number) ?? 500,
+          rest as QueryParams, (page_size as number) ?? 20,
+        );
       }
-      return listWior(params);
+      return listWior(args as QueryParams);
     }
     case "ams_storingsmeldingen_list": return listStoringsmeldingen(args as QueryParams);
     case "ams_stroomstoringen_list": return listStroomstoringen(args as QueryParams);

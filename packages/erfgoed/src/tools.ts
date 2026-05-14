@@ -15,6 +15,7 @@ export const erfgoedToolDefinitions: readonly ToolDef[] = [
       "adressering[like]": { type: "string", description: "Adres of straatnaam bevat (wildcard), bijv. 'Bloemgracht' of 'Jordaan'" },
       oorspronkelijkeFunctie: { type: "string", description: "Oorspronkelijke functie, bijv. 'Woning', 'Kerk'" },
       jaarBeginVan: { type: "number", description: "Bouwjaar (exacte overeenkomst). Opmerking: range-filters [gte]/[lte] worden niet ondersteund door upstream." },
+      bagPandId: { type: "string", description: "BAG pand-ID (bijv. 0363100012177213). Geeft het monument terug dat aan dit pand is gekoppeld." },
       ...nearRadiusProps,
     },
   }),
