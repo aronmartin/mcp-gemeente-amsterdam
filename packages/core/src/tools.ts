@@ -59,9 +59,10 @@ export function listTool(opts: {
   extraProps?: Record<string, PropSchema>;
   required?: readonly string[];
 }): ToolDef {
-  const description = opts.schema
+  const strategyHint = "\n\nStrategie: gebruik filters voor specifieke items (<10 resultaten). Voor tellingen of analyses over alle records: gebruik groupBy+count — ruwe items komen dan nooit in de context.";
+  const description = (opts.schema
     ? opts.description + formatSchemaDescription(opts.schema)
-    : opts.description;
+    : opts.description) + strategyHint;
 
   return {
     name: opts.name,
