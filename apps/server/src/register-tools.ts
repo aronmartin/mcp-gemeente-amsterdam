@@ -19,13 +19,39 @@ import { winkelgebiedenToolDefinitions, handleWinkelgebiedenTool } from "@amster
 import { meldingenToolDefinitions, handleMeldingenTool } from "@amsterdam-mcp/meldingen";
 import { verkiezingenToolDefinitions, handleVerkiezingenTool } from "@amsterdam-mcp/verkiezingen";
 import { analyseToolDefinitions, handleAnalyseTool } from "@amsterdam-mcp/analyse";
+import { aggregatieToolDefinitions, handleAggregatieTool } from "@amsterdam-mcp/aggregatie";
 import { buildZodSchema } from "./json-schema-to-zod.js";
 import type { JsonSchemaProp } from "./types.js";
-import type { ToolDef, DsoPage } from "@amsterdam-mcp/core";
+import type { ToolDef, DsoPage, GeoOp } from "@amsterdam-mcp/core";
+import { buildIntersectsParam, applyGeoOp } from "@amsterdam-mcp/core";
 import { resolveProfile } from "./response-profiles.js";
 import { GEOMETRY_KEYS, geometryToCentroid, shapeItem } from "./shape-response.js";
 
 const MAX_RESPONSE_BYTES = 200_000;
+
+const AGGREGATE_PARAMS = new Set(["groupBy", "sum", "avg", "count", "limit", "filter"]);
+const GEO_PARAMS = new Set(["nearLat", "nearLon", "radiusMeters"]);
+const GEO_OP_PARAMS = new Set(["geoOp", "geoLat", "geoLon"]);
+
+function stripGeometry(value: unknown): unknown {
+  if (Array.isArray(value)) return value.map(stripGeometry);
+  if (value !== null && typeof value === "object") {
+    const obj = value as Record<string, unknown>;
+    const result: Record<string, unknown> = {};
+    for (const [k, v] of Object.entries(obj)) {
+      if (GEOMETRY_KEYS.has(k)) {
+        const centroid = geometryToCentroid(v);
+        if (centroid) result["_centroid"] = centroid;
+      } else if (k === "coordinates" && Array.isArray(v)) {
+        // bare coordinates array — skip (geometry already handled via parent)
+      } else {
+        result[k] = stripGeometry(v);
+      }
+    }
+    return result;
+  }
+  return value;
+}
 
 function processValue(value: unknown): unknown {
   if (Array.isArray(value)) return value.map(processValue);
@@ -110,6 +136,83 @@ function toMcpToolSpec(tool: ToolDef, executeTool: ToolExecutor): RegisteredTool
       required,
     ),
     execute: async (args) => {
+      // List tools (have endpoint) route via aggregate
+      if (tool.endpoint) {
+        const { detail, fields, ...restArgs } = args;
+
+        const aggregateArgs: Record<string, unknown> = {};
+        const geoArgs: Record<string, unknown> = {};
+        const geoOpArgs: Record<string, unknown> = {};
+        const apiFilters: Record<string, unknown> = {};
+
+        for (const [key, val] of Object.entries(restArgs)) {
+          if (AGGREGATE_PARAMS.has(key)) aggregateArgs[key] = val;
+          else if (GEO_PARAMS.has(key)) geoArgs[key] = val;
+          else if (GEO_OP_PARAMS.has(key)) geoOpArgs[key] = val;
+          else apiFilters[key] = val;
+        }
+
+        const geoOp = geoOpArgs.geoOp as GeoOp | undefined;
+        const geoLat = geoOpArgs.geoLat as number | undefined;
+        const geoLon = geoOpArgs.geoLon as number | undefined;
+
+        // Geo → geo[intersects]
+        const geoFilter: Record<string, unknown> = {};
+        if (geoArgs.nearLat && geoArgs.nearLon) {
+          const radius = (geoArgs.radiusMeters as number) ?? 500;
+          geoFilter["geo[intersects]"] = buildIntersectsParam(
+            geoArgs.nearLat as number,
+            geoArgs.nearLon as number,
+            radius,
+          );
+        }
+
+        const hasAggregateParams = aggregateArgs.groupBy ||
+          (Array.isArray(aggregateArgs.sum) && aggregateArgs.sum.length) ||
+          (Array.isArray(aggregateArgs.avg) && aggregateArgs.avg.length) ||
+          aggregateArgs.count;
+        const effectiveLimit = hasAggregateParams
+          ? undefined
+          : (typeof aggregateArgs.limit === "number" ? aggregateArgs.limit : 25);
+
+        // Merge: apiFilters as base, geoFilter always added, explicit filter object wins
+        const mergedFilter = {
+          ...apiFilters,
+          ...geoFilter,
+          ...(aggregateArgs.filter && typeof aggregateArgs.filter === "object"
+            ? aggregateArgs.filter as Record<string, unknown>
+            : {}),
+        };
+
+        const result = await handleAggregatieTool("ams_aggregate", {
+          endpoint: tool.endpoint,
+          groupBy: aggregateArgs.groupBy,
+          sum: aggregateArgs.sum,
+          avg: aggregateArgs.avg,
+          count: aggregateArgs.count,
+          limit: effectiveLimit,
+          filter: mergedFilter,
+        });
+
+        // Verwerk geometry: altijd strippen, optioneel geoOp toepassen
+        const raw = result as Record<string, unknown>[];
+        const processed = raw.map(item => {
+          const stripped = stripGeometry(item) as Record<string, unknown>;
+          if (geoOp) {
+            const opResult = applyGeoOp(
+              item,
+              geoOp,
+              geoLat,
+              geoLon,
+            );
+            return { ...stripped, ...opResult };
+          }
+          return stripped;
+        });
+        return JSON.stringify(processed, null, 2);
+      }
+
+      // Get tools use original handler
       const { detail = "default", fields, ...upstreamArgs } = args;
       const result = await executeTool(tool.name, upstreamArgs);
       return formatResult(
@@ -147,6 +250,7 @@ const amsterdamToolBundles: readonly ToolBundle[] = [
   { definitions: meldingenToolDefinitions, executeTool: handleMeldingenTool },
   { definitions: verkiezingenToolDefinitions, executeTool: handleVerkiezingenTool },
   { definitions: analyseToolDefinitions, executeTool: handleAnalyseTool },
+  { definitions: aggregatieToolDefinitions, executeTool: handleAggregatieTool },
 ];
 
 export function registerAmsterdamTools(server: FastMCP): FastMCP {

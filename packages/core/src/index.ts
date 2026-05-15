@@ -1,7 +1,7 @@
 export { AmsClient, defaultClient } from "./client.js";
 export type { DsoPage, QueryParams } from "./client.js";
 export { listTool, getTool, makeDispatcher } from "./tools.js";
-export type { ToolDef, ToolHandler, PropSchema } from "./tools.js";
+export type { ToolDef, ToolHandler, PropSchema, EndpointSchemaRef } from "./tools.js";
 export {
   rdToWgs84,
   wgs84ToRd,
@@ -11,4 +11,6 @@ export {
   applyNearFilter,
   nearRadiusProps,
   fetchNearRadius,
+  applyGeoOp,
 } from "./geo.js";
+export type { GeoOp, GeoOpResult } from "./geo.js";

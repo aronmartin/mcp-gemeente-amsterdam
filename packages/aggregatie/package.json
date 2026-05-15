@@ -1,7 +1,7 @@
 {
-  "name": "@amsterdam-mcp/groen",
+  "name": "@amsterdam-mcp/aggregatie",
   "version": "0.1.0",
-  "description": "Bomen, ecologie en groengebieden",
+  "description": "Schema-introspectie en server-side aggregatie voor Amsterdam open data",
   "type": "module",
   "main": "./dist/index.js",
   "types": "./dist/index.d.ts",
@@ -20,8 +20,7 @@
     "access": "public"
   },
   "dependencies": {
-    "@amsterdam-mcp/core": "workspace:^",
-    "@amsterdam-mcp/aggregatie": "workspace:^"
+    "@amsterdam-mcp/core": "workspace:^"
   },
   "devDependencies": {
     "typescript": "*"

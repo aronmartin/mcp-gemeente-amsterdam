@@ -1,9 +1,12 @@
 import { listTool, getTool, type ToolDef, nearRadiusProps } from "@amsterdam-mcp/core";
+import { ENDPOINT_SCHEMAS } from "@amsterdam-mcp/aggregatie";
 
 
 export const erfgoedToolDefinitions: readonly ToolDef[] = [
   listTool({
     name: "ams_monumenten_list",
+    endpoint: "monumenten/monumenten",
+    schema: ENDPOINT_SCHEMAS["monumenten/monumenten"],
     description: [
       "Zoek Amsterdamse monumenten (monuments, heritage, listed buildings) op naam, adres of bouwjaar.",
       "Voor adres-gebaseerde lookup: gebruik bij voorkeur betreftBagPand.identificatie (haal bag.pandId op via ams_resolve_location) — dit is betrouwbaarder dan nearLat/nearLon of adressering[like] voor ensemble-monumenten waarbij het centroid ver van het gezochte adres kan liggen.",
@@ -29,6 +32,8 @@ export const erfgoedToolDefinitions: readonly ToolDef[] = [
   }),
   listTool({
     name: "ams_beschermde_stadsgezichten_list",
+    endpoint: "beschermdestadsdorpsgezichten/beschermdestadsdorpsgezichten",
+    schema: ENDPOINT_SCHEMAS["beschermdestadsdorpsgezichten/beschermdestadsdorpsgezichten"],
     description: [
       "Geeft beschermde stads- en dorpsgezichten terug (aangewezen beschermde gebieden).",
       "Gebruik nearLat+nearLon+radiusMeters (~50m) om te controleren of een specifiek adres binnen een beschermd gezicht valt.",
@@ -40,6 +45,8 @@ export const erfgoedToolDefinitions: readonly ToolDef[] = [
   }),
   listTool({
     name: "ams_amsterdam_canon_list",
+    endpoint: "amsterdam_canon/canon_amsterdam_2025",
+    schema: ENDPOINT_SCHEMAS["amsterdam_canon/canon_amsterdam_2025"],
     description: "Geeft items uit de Canon van Amsterdam terug: historische gebeurtenissen met jaar en locatie.",
     extraProps: {},
   }),

@@ -1,8 +1,11 @@
 import { listTool, getTool, type ToolDef, nearRadiusProps } from "@amsterdam-mcp/core";
+import { ENDPOINT_SCHEMAS } from "@amsterdam-mcp/aggregatie";
 
 export const afvalToolDefinitions: readonly ToolDef[] = [
   listTool({
     name: "ams_afvalcontainers_list",
+    endpoint: "huishoudelijkafval/container",
+    schema: ENDPOINT_SCHEMAS["huishoudelijkafval/container"],
     description: [
       "Zoek afvalcontainers op fractie, eigenaarschap of buurt.",
       "Geldige fractieOmschrijving-waarden: 'Glas', 'Papier', 'Restafval', 'Textiel', 'Plastic', 'Brood', 'GFT'.",
@@ -24,6 +27,8 @@ export const afvalToolDefinitions: readonly ToolDef[] = [
   }),
   listTool({
     name: "ams_afvalwijzer_list",
+    endpoint: "afvalwijzer/afvalwijzer",
+    schema: ENDPOINT_SCHEMAS["afvalwijzer/afvalwijzer"],
     description: "Geeft afvalwijzer-informatie terug: ophaaldagen en instructies per afvalfractie.",
     extraProps: {
       afvalwijzerFractieCode: { type: "string", description: "Code van de afvalfractie" },
@@ -34,6 +39,8 @@ export const afvalToolDefinitions: readonly ToolDef[] = [
   }),
   listTool({
     name: "ams_recyclepunten_list",
+    endpoint: "recyclepunten/wegingen",
+    schema: ENDPOINT_SCHEMAS["recyclepunten/wegingen"],
     description: "Geeft wegingen van recyclepunten (milieustraten) terug.",
     extraProps: {
       "datumWeging[gte]": { type: "string", description: "Datum weging vanaf (YYYY-MM-DD)" },

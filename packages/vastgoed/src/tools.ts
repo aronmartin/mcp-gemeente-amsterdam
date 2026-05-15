@@ -1,8 +1,11 @@
 import { listTool, type ToolDef } from "@amsterdam-mcp/core";
+import { ENDPOINT_SCHEMAS } from "@amsterdam-mcp/aggregatie";
 
 export const vastgoedToolDefinitions: readonly ToolDef[] = [
   listTool({
     name: "ams_woz_list",
+    endpoint: "woz/objecten",
+    schema: ENDPOINT_SCHEMAS["woz/objecten"],
     description: [
       "Geeft WOZ-objecten terug met gebruikscode, soortobject en geldigheidsdatum.",
       "Let op: de vastgesteldeWaarde (WOZ-bedrag) is niet beschikbaar in deze publieke API — alleen objecttype en gebruikscode worden ontsloten.",
@@ -16,6 +19,8 @@ export const vastgoedToolDefinitions: readonly ToolDef[] = [
   }),
   listTool({
     name: "ams_gemeentelijk_vastgoed_list",
+    endpoint: "gemeentelijk_vastgoed/gebouwobjecten",
+    schema: ENDPOINT_SCHEMAS["gemeentelijk_vastgoed/gebouwobjecten"],
     description: "Geeft gemeentelijk vastgoed terug (panden en terreinen in eigendom van de gemeente Amsterdam).",
     extraProps: {
       eigendom: { type: "string", description: "Eigendomsvorm" },
@@ -25,6 +30,8 @@ export const vastgoedToolDefinitions: readonly ToolDef[] = [
   }),
   listTool({
     name: "ams_nieuwbouwplannen_list",
+    endpoint: "nieuwbouwplannen/woningbouwplannen_openbaar",
+    schema: ENDPOINT_SCHEMAS["nieuwbouwplannen/woningbouwplannen_openbaar"],
     description: "Geeft nieuwbouwplannen terug (publiek deel): woningbouwprojecten in Amsterdam.",
     extraProps: {
       buurtCode: { type: "string", description: "Buurtcode" },
@@ -36,6 +43,8 @@ export const vastgoedToolDefinitions: readonly ToolDef[] = [
   }),
   listTool({
     name: "ams_grex_list",
+    endpoint: "grex/projecten",
+    schema: ENDPOINT_SCHEMAS["grex/projecten"],
     description: "Geeft grondexploitaties terug: gebiedsontwikkelingsprojecten van de gemeente.",
     extraProps: {
       plannaam: { type: "string", description: "Naam van het plan" },
@@ -45,6 +54,8 @@ export const vastgoedToolDefinitions: readonly ToolDef[] = [
   }),
   listTool({
     name: "ams_precariobelasting_list",
+    endpoint: "precariobelasting/terrassen",
+    schema: ENDPOINT_SCHEMAS["precariobelasting/terrassen"],
     description: "Geeft precariobelastingzones terug (belasting voor gebruik gemeentegrond, bijv. terrassen).",
     extraProps: {
       categorie: { type: "string", description: "Categorie precario" },

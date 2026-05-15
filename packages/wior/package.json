@@ -20,7 +20,8 @@
     "access": "public"
   },
   "dependencies": {
-    "@amsterdam-mcp/core": "workspace:^"
+    "@amsterdam-mcp/core": "workspace:^",
+    "@amsterdam-mcp/aggregatie": "workspace:^"
   },
   "devDependencies": {
     "typescript": "*"

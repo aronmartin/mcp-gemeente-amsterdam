@@ -9,7 +9,9 @@ function propToBaseZod(prop: JsonSchemaProp): z.ZodTypeAny {
         ? z.number()
         : prop.type === "array"
           ? z.array(z.string())
-          : z.unknown();
+          : prop.type === "object"
+            ? z.record(z.string(), z.unknown())
+            : z.unknown();
 
   return prop.description ? baseSchema.describe(prop.description) : baseSchema;
 }
