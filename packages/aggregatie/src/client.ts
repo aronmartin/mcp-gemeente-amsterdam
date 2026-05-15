@@ -192,9 +192,10 @@ export async function aggregate(params: AggregateParams): Promise<Record<string,
 
   const acc = new Map<string, GroupAcc>();
 
-  // Pagina 1 ophalen
+  // Pagina 1 ophalen — _count=true zodat totalPages altijd aanwezig is
   const firstResult = await client.list<Record<string, unknown>>(dataset, collection, {
     ...(params.filter ?? {}),
+    _count: true,
     page: 1,
     page_size: PAGE_SIZE,
   });
