@@ -202,10 +202,9 @@ export async function aggregate(params: AggregateParams): Promise<Record<string,
 
   processPage(firstResult as PageResult, acc, params);
 
-  const totalPages = (firstResult as PageResult).page?.totalPages ?? null;
+  const totalPages = (firstResult as PageResult).page?.totalPages ?? 1;
 
-  if (totalPages !== null && totalPages > 1) {
-    // Alle overige pagina's parallel ophalen
+  if (totalPages > 1) {
     const remainingPages = Array.from(
       { length: Math.min(totalPages - 1, MAX_PAGES - 1) },
       (_, i) => i + 2
@@ -215,6 +214,7 @@ export async function aggregate(params: AggregateParams): Promise<Record<string,
       remainingPages.map((pageNum) => async () => {
         const result = await client.list<Record<string, unknown>>(dataset, collection, {
           ...(params.filter ?? {}),
+          _count: true,
           page: pageNum,
           page_size: PAGE_SIZE,
         });
@@ -222,20 +222,6 @@ export async function aggregate(params: AggregateParams): Promise<Record<string,
       }),
       CONCURRENCY
     );
-  } else if (totalPages === null) {
-    // Fallback: geen totalPages bekend, sequentieel met next links
-    let hasMore = !!(firstResult as PageResult)._links?.next?.href;
-    let page = 2;
-    while (hasMore && page <= MAX_PAGES) {
-      const result = await client.list<Record<string, unknown>>(dataset, collection, {
-        ...(params.filter ?? {}),
-        page,
-        page_size: PAGE_SIZE,
-      });
-      processPage(result as PageResult, acc, params);
-      hasMore = !!(result as PageResult)._links?.next?.href;
-      page++;
-    }
   }
 
   const rows: Record<string, unknown>[] = [];
