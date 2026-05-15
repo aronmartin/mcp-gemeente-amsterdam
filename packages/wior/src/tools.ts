@@ -3,6 +3,7 @@ import { listTool, type ToolDef, nearRadiusProps } from "@amsterdam-mcp/core";
 export const wiorToolDefinitions: readonly ToolDef[] = [
   listTool({
     name: "ams_wior_list",
+    endpoint: "wior/wior",
     description: [
       "Geeft werkzaamheden in de openbare ruimte terug: geplande en actieve graafwerken, rioleringsprojecten etc.",
       "Gebruik nearLat+nearLon+radiusMeters om graafwerken in de buurt van een punt te vinden (sorteert op afstand, voegt _distanceMeters toe).",
@@ -22,6 +23,7 @@ export const wiorToolDefinitions: readonly ToolDef[] = [
   }),
   listTool({
     name: "ams_storingsmeldingen_list",
+    endpoint: "storingsmeldingen_ovl_en_klokken/openbare_verlichting",
     description: "Geeft storingsmeldingen van openbare verlichting en klokken terug.",
     extraProps: {
       storingstatus: { type: "number", description: "Status van de storing als getal, bijv. 0 (gemeld), 1 (in behandeling), 2 (opgelost)" },
@@ -32,6 +34,7 @@ export const wiorToolDefinitions: readonly ToolDef[] = [
   }),
   listTool({
     name: "ams_stroomstoringen_list",
+    endpoint: "stroomstoringen/stroomstoringen",
     description: "Geeft stroomstoringen terug met tijdsduur, locatie en aantal getroffen aansluitingen.",
     extraProps: {},
   }),

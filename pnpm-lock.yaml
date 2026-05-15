@@ -99,6 +99,9 @@ importers:
       '@amsterdam-mcp/afval':
         specifier: workspace:^
         version: link:../../packages/afval
+      '@amsterdam-mcp/aggregatie':
+        specifier: workspace:^
+        version: link:../../packages/aggregatie
       '@amsterdam-mcp/analyse':
         specifier: workspace:^
         version: link:../../packages/analyse
@@ -244,6 +247,16 @@ importers:
         version: 5.9.3
 
   packages/afval:
+    dependencies:
+      '@amsterdam-mcp/core':
+        specifier: workspace:^
+        version: link:../core
+    devDependencies:
+      typescript:
+        specifier: '*'
+        version: 5.9.3
+
+  packages/aggregatie:
     dependencies:
       '@amsterdam-mcp/core':
         specifier: workspace:^

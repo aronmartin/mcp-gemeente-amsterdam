@@ -1,0 +1,104 @@
+import type { ToolDef } from "@amsterdam-mcp/core";
+
+export const aggregatieToolDefinitions: readonly ToolDef[] = [
+  {
+    name: "ams_get_schema",
+    description: [
+      "Geeft het veldschema van een Amsterdam API endpoint terug:",
+      "veldnamen, datatypes en welke velden numeriek zijn (geschikt voor sum/avg).",
+      "Gebruik dit vóór ams_aggregate om te weten welke velden beschikbaar zijn.",
+      "Endpoint formaat: 'dataset' of 'dataset/collection',",
+      "bijv. 'nieuwbouwplannen', 'meldingen', 'bag/verblijfsobjecten'.",
+    ].join(" "),
+    parameters: {
+      type: "object",
+      properties: {
+        endpoint: {
+          type: "string",
+          description: "Endpoint naam, bijv. 'nieuwbouwplannen' of 'bag/verblijfsobjecten'",
+        },
+      },
+      required: ["endpoint"] as const,
+    },
+  },
+  {
+    name: "ams_aggregate",
+    description: [
+      "Haalt een volledige Amsterdam API dataset op en reduceert die server-side naar een compacte samenvatting.",
+      "Werkt als een streaming map-reduce: elke pagina (500 items) wordt direct verwerkt in een accumulator,",
+      "de ruwe items worden daarna weggegooid - de volledige dataset komt nooit in de context.",
+      "",
+      "Reduce-patroon per item:",
+      "  acc[groupBy-waarde].count += 1",
+      "  acc[groupBy-waarde][sumVeld] += item[sumVeld]  (NaN-veilig: null/undefined telt als 0)",
+      "  acc[groupBy-waarde][avgVeld]_sum += item[avgVeld]; _n += 1  (null wordt overgeslagen)",
+      "",
+      "Output-structuur per rij:",
+      "  { [groupBy]: waarde, count?: number, [sumVeld]: number, [avgVeld]_avg: number|null }",
+      "  avg-velden heten '{veld}_avg' in de output, niet '{veld}'.",
+      "  groupBy-waarden die null/undefined zijn in de data worden teruggegeven als null.",
+      "  Zonder groupBy: één rij met de totalen over de volledige dataset.",
+      "",
+      "Edge cases:",
+      "  - Ontbrekende sum-velden in een item tellen mee als 0.",
+      "  - Ontbrekende avg-velden worden niet meegeteld in het gemiddelde (teller én noemer worden overgeslagen).",
+      "  - avg-resultaat is null als alle waarden ontbraken.",
+      "  - Resultaat is gesorteerd op groupBy-waarde (alfabetisch).",
+      "",
+      "Workflow: roep eerst ams_get_schema aan om veldnamen en numeric_fields te kennen.",
+      "Endpoint formaat: 'dataset' of 'dataset/collection', bijv. 'nieuwbouwplannen' of 'bag/verblijfsobjecten'.",
+      "",
+      "Filter-parameter: key-value object met Amsterdam API filterparameters.",
+      "Exacte match: { stadsdeelNaam: 'Noord' }",
+      "Range-operators (datums en getallen):",
+      "  { 'startBouwGepland[lt]': '2028-01-01' }   → vóór 2028",
+      "  { 'startBouwGepland[gte]': '2035-01-01' }  → vanaf 2035",
+      "  { 'aantalWoningen[gt]': '100' }             → meer dan 100",
+      "Combineren: { 'startBouwGepland[gte]': '2025-01-01', stadsdeelNaam: 'Noord' }",
+      "",
+      "Redeneerpatroon voor tijdsvragen (bijv. 'hoeveel woningen voor 2028 vs na 2035'):",
+      "  1. Welk datumveld bepaalt de periode? → gebruik ams_get_schema",
+      "  2. Kan de tool direct op jaar groeperen? Nee → twee aparte calls met filter",
+      "     call 1: filter { 'startBouwGepland[lt]': '2028-01-01' }, count=true",
+      "     call 2: filter { 'startBouwGepland[gte]': '2036-01-01' }, count=true",
+      "  3. Resultaat: twee getallen, geen Python nodig",
+    ].join(" "),
+    parameters: {
+      type: "object",
+      properties: {
+        endpoint: {
+          type: "string",
+          description: "Endpoint naam, bijv. 'nieuwbouwplannen' of 'parkeervakken'",
+        },
+        groupBy: {
+          type: "string",
+          description: "Veldnaam om op te groeperen, bijv. 'stadsdeelNaam'. Weglaten = één totaalrij.",
+        },
+        sum: {
+          type: "array",
+          description: "Numerieke veldnamen om per groep op te tellen. Null/ontbrekend telt als 0.",
+          items: { type: "string" },
+        },
+        avg: {
+          type: "array",
+          description: "Numerieke veldnamen voor gemiddelde per groep. Output-key wordt '{veld}_avg'. Null-waarden worden overgeslagen.",
+          items: { type: "string" },
+        },
+        count: {
+          type: "string",
+          description: "Gebruik 'true' om het aantal items per groep als 'count' in de output op te nemen.",
+        },
+        filter: {
+          type: "object",
+          description: "API-filterparameters als key-value object. Exacte match: { stadsdeelNaam: 'Noord' }. Range-operators: { 'startBouwGepland[lt]': '2028-01-01', 'aantalWoningen[gte]': '50' }.",
+          additionalProperties: { type: "string" },
+        },
+        limit: {
+          type: "number",
+          description: "Maximaal aantal items terug te geven zonder aggregatie. Gebruik voor 'toon me voorbeelden'. Kan niet gecombineerd worden met groupBy/sum/avg.",
+        },
+      },
+      required: ["endpoint"] as const,
+    },
+  },
+] as const;

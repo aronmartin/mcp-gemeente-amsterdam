@@ -3,6 +3,7 @@ import { listTool, getTool, type ToolDef, type PropSchema } from "@amsterdam-mcp
 export const gebiedenToolDefinitions: readonly ToolDef[] = [
   listTool({
     name: "ams_gebieden_list_stadsdelen",
+    endpoint: "gebieden/stadsdelen",
     description: "Geeft alle Amsterdamse stadsdelen terug (bijv. Centrum, Noord, West).",
     extraProps: {
       naam: { type: "string", description: "Naam van het stadsdeel" },
@@ -11,6 +12,7 @@ export const gebiedenToolDefinitions: readonly ToolDef[] = [
   }),
   listTool({
     name: "ams_gebieden_list_wijken",
+    endpoint: "gebieden/wijken",
     description: [
       "Geeft wijken terug, optioneel gefilterd op stadsdeel.",
       "Voor stadsdeel-filtering: gebruik ams_gebieden_list_stadsdelen om de identificatie op te zoeken, filter dan op ligtInStadsdeel.identificatie.",
@@ -22,6 +24,7 @@ export const gebiedenToolDefinitions: readonly ToolDef[] = [
   }),
   listTool({
     name: "ams_gebieden_list_buurten",
+    endpoint: "gebieden/buurten",
     description: [
       "Geeft buurten terug, optioneel gefilterd op naam, code of wijk.",
       "Voor wijk-filtering: gebruik ams_gebieden_list_wijken om de identificatie op te zoeken, filter dan op ligtInWijk.identificatie.",
@@ -40,6 +43,7 @@ export const gebiedenToolDefinitions: readonly ToolDef[] = [
   }),
   listTool({
     name: "ams_gebieden_list_ggwgebieden",
+    endpoint: "gebieden/ggwgebieden",
     description: "Geeft GGW-gebieden (gebiedsgericht werken) terug.",
     extraProps: {
       naam: { type: "string", description: "Naam van het GGW-gebied" },
@@ -47,6 +51,7 @@ export const gebiedenToolDefinitions: readonly ToolDef[] = [
   }),
   listTool({
     name: "ams_gebieden_list_grootstedelijke_gebieden",
+    endpoint: "gebieden/grootstedelijke_projecten",
     description: "Geeft grootstedelijke gebieden terug (bijv. Amstel III, Zuidas, Haven).",
     extraProps: {
       naam: { type: "string", description: "Naam van het grootstedelijk gebied" },

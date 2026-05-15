@@ -19,6 +19,7 @@ import { winkelgebiedenToolDefinitions, handleWinkelgebiedenTool } from "@amster
 import { meldingenToolDefinitions, handleMeldingenTool } from "@amsterdam-mcp/meldingen";
 import { verkiezingenToolDefinitions, handleVerkiezingenTool } from "@amsterdam-mcp/verkiezingen";
 import { analyseToolDefinitions, handleAnalyseTool } from "@amsterdam-mcp/analyse";
+import { aggregatieToolDefinitions, handleAggregatieTool } from "@amsterdam-mcp/aggregatie";
 import { buildZodSchema } from "./json-schema-to-zod.js";
 import type { JsonSchemaProp } from "./types.js";
 import type { ToolDef, DsoPage } from "@amsterdam-mcp/core";
@@ -110,6 +111,33 @@ function toMcpToolSpec(tool: ToolDef, executeTool: ToolExecutor): RegisteredTool
       required,
     ),
     execute: async (args) => {
+      // List tools (have endpoint) route via aggregate
+      if (tool.endpoint) {
+        const { detail, fields, groupBy, sum, avg, count, filter, limit, ...domainFilters } = args;
+
+        const hasAggregateParams = groupBy || (Array.isArray(sum) && sum.length) ||
+                                    (Array.isArray(avg) && avg.length) || count;
+        const effectiveLimit = hasAggregateParams ? undefined : (typeof limit === "number" ? limit : 25);
+
+        const mergedFilter = {
+          ...domainFilters,
+          ...(filter && typeof filter === "object" ? filter as Record<string, unknown> : {}),
+        };
+
+        const result = await handleAggregatieTool("ams_aggregate", {
+          endpoint: tool.endpoint,
+          groupBy,
+          sum,
+          avg,
+          count,
+          limit: effectiveLimit,
+          filter: mergedFilter,
+        });
+
+        return JSON.stringify(result, null, 2);
+      }
+
+      // Get tools use original handler
       const { detail = "default", fields, ...upstreamArgs } = args;
       const result = await executeTool(tool.name, upstreamArgs);
       return formatResult(
@@ -147,6 +175,7 @@ const amsterdamToolBundles: readonly ToolBundle[] = [
   { definitions: meldingenToolDefinitions, executeTool: handleMeldingenTool },
   { definitions: verkiezingenToolDefinitions, executeTool: handleVerkiezingenTool },
   { definitions: analyseToolDefinitions, executeTool: handleAnalyseTool },
+  { definitions: aggregatieToolDefinitions, executeTool: handleAggregatieTool },
 ];
 
 export function registerAmsterdamTools(server: FastMCP): FastMCP {

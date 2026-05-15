@@ -3,6 +3,7 @@ import { listTool, type ToolDef } from "@amsterdam-mcp/core";
 export const meldingenToolDefinitions: readonly ToolDef[] = [
   listTool({
     name: "ams_meldingen_list",
+    endpoint: "meldingen/meldingen",
     description: "Geeft meldingen openbare ruimte terug: klachten over vuil, kapotte bestrating, overlast etc. Filteer op categorie, status of datum.",
     extraProps: {
       hoofdcategorie: { type: "string", description: "Hoofdcategorie, bijv. 'Overlast van en door personen of groepen', 'Afval'" },

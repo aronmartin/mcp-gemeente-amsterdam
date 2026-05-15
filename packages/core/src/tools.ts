@@ -3,11 +3,13 @@ export type PropSchema = {
   description?: string;
   items?: { type: string };
   enum?: string[];
+  additionalProperties?: { type: string };
 };
 
 export type ToolDef = {
   name: string;
   description: string;
+  endpoint?: string;
   parameters: {
     type: "object";
     properties: Record<string, PropSchema>;
@@ -19,27 +21,23 @@ export type ToolDef = {
 export function listTool(opts: {
   name: string;
   description: string;
+  endpoint?: string;
   extraProps?: Record<string, PropSchema>;
   required?: readonly string[];
 }): ToolDef {
   return {
     name: opts.name,
     description: opts.description,
+    endpoint: opts.endpoint,
     parameters: {
       type: "object",
       properties: {
-        page: { type: "number", description: "Paginanummer (standaard 1)" },
-        page_size: { type: "number", description: "Resultaten per pagina (standaard 20, max 1000)" },
-        _sort: { type: "string", description: "Sorteerveld, prefix met - voor aflopend" },
-        detail: {
-          type: "string",
-          enum: ["minimal", "default", "full"],
-          description: "Responsprofiel: minimal=kernvelden, default=standaard (aanbevolen), full=alles inclusief geometrie. Gebruik full alleen als geometrie of alle velden expliciet nodig zijn.",
-        },
-        fields: {
-          type: "string",
-          description: "Komma-gescheiden extra velden of overschrijvingen, bv. 'geometrie,_links.betreftBagPand'. Wint altijd van detail.",
-        },
+        groupBy: { type: "string", description: "Veldnaam om op te groeperen voor analytische vragen, bijv. 'stadsdeelNaam'." },
+        sum: { type: "array", items: { type: "string" }, description: "Numerieke veldnamen om op te tellen per groep." },
+        avg: { type: "array", items: { type: "string" }, description: "Numerieke veldnamen voor gemiddelde per groep. Output-key wordt '{veld}_avg'." },
+        count: { type: "string", description: "Gebruik 'true' om het aantal items per groep te tellen." },
+        limit: { type: "number", description: "Maximaal aantal items terug te geven (zonder aggregatie). Standaard 25 als geen aggregate-params opgegeven." },
+        filter: { type: "object", additionalProperties: { type: "string" }, description: "Extra API-filterparameters. Range-operators: { 'veld[gte]': '2024-01-01', 'veld[lt]': '2025-01-01' }." },
         ...opts.extraProps,
       },
       required: opts.required ?? ([] as const),

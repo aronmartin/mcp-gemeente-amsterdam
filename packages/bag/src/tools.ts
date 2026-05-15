@@ -3,6 +3,7 @@ import { listTool, getTool, type ToolDef } from "@amsterdam-mcp/core";
 export const bagToolDefinitions: readonly ToolDef[] = [
   listTool({
     name: "ams_bag_list_verblijfsobjecten",
+    endpoint: "bag/verblijfsobjecten",
     description: [
       "Zoek verblijfsobjecten (woningen, kantoren, winkels) in Amsterdam via gebruiksdoel of status.",
       "Om te filteren op adres: gebruik eerst ams_bag_list_nummeraanduidingen (postcode + huisnummer) om de nummeraanduiding-identificatie te vinden, filter dan op heeftHoofdadres.identificatie.",
@@ -21,6 +22,7 @@ export const bagToolDefinitions: readonly ToolDef[] = [
   }),
   listTool({
     name: "ams_bag_list_panden",
+    endpoint: "bag/panden",
     description: "Zoek BAG-panden (gebouwen) op bouwjaar of status.",
     extraProps: {
       oorspronkelijkBouwjaar: { type: "number", description: "Bouwjaar" },
@@ -37,6 +39,7 @@ export const bagToolDefinitions: readonly ToolDef[] = [
   }),
   listTool({
     name: "ams_bag_list_nummeraanduidingen",
+    endpoint: "bag/nummeraanduidingen",
     description: [
       "Zoek adressen (nummeraanduidingen) op postcode, huisnummer of straat.",
       "Voor straatnaam-zoeken: gebruik eerst ams_bag_list_openbareruimtes met naam om de identificatie op te zoeken, filter dan op ligtAanOpenbareruimte.identificatie.",
@@ -50,6 +53,7 @@ export const bagToolDefinitions: readonly ToolDef[] = [
   }),
   listTool({
     name: "ams_bag_list_openbareruimtes",
+    endpoint: "bag/openbareruimtes",
     description: "Zoek openbare ruimten (straten, pleinen, water) op naam of type.",
     extraProps: {
       naam: { type: "string", description: "Naam van de openbare ruimte, bijv. 'Damrak'" },
@@ -59,6 +63,7 @@ export const bagToolDefinitions: readonly ToolDef[] = [
   }),
   listTool({
     name: "ams_bag_list_woonplaatsen",
+    endpoint: "bag/woonplaatsen",
     description: "Geeft de BAG-woonplaatsen terug (Amsterdam, Weesp, etc.).",
     extraProps: {
       naam: { type: "string", description: "Naam van de woonplaats" },
@@ -66,6 +71,7 @@ export const bagToolDefinitions: readonly ToolDef[] = [
   }),
   listTool({
     name: "ams_bag_list_standplaatsen",
+    endpoint: "bag/standplaatsen",
     description: "Zoek standplaatsen (officiële locaties voor woonwagens) op status.",
     extraProps: {
       statusCode: { type: "string", description: "Status" },
@@ -73,6 +79,7 @@ export const bagToolDefinitions: readonly ToolDef[] = [
   }),
   listTool({
     name: "ams_bag_list_ligplaatsen",
+    endpoint: "bag/ligplaatsen",
     description: "Zoek ligplaatsen (officiële waterlocaties voor woonboten) op status.",
     extraProps: {
       statusCode: { type: "string", description: "Status" },
