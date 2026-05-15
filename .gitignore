@@ -6,3 +6,6 @@ dist/
 .env.local
 *.mcpb
 .claude/
+/pnpm
+/turbo
+/mcp-nl-public@
