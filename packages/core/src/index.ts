@@ -11,4 +11,6 @@ export {
   applyNearFilter,
   nearRadiusProps,
   fetchNearRadius,
+  applyGeoOp,
 } from "./geo.js";
+export type { GeoOp, GeoOpResult } from "./geo.js";

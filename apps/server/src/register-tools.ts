@@ -22,8 +22,8 @@ import { analyseToolDefinitions, handleAnalyseTool } from "@amsterdam-mcp/analys
 import { aggregatieToolDefinitions, handleAggregatieTool } from "@amsterdam-mcp/aggregatie";
 import { buildZodSchema } from "./json-schema-to-zod.js";
 import type { JsonSchemaProp } from "./types.js";
-import type { ToolDef, DsoPage } from "@amsterdam-mcp/core";
-import { buildIntersectsParam } from "@amsterdam-mcp/core";
+import type { ToolDef, DsoPage, GeoOp } from "@amsterdam-mcp/core";
+import { buildIntersectsParam, applyGeoOp } from "@amsterdam-mcp/core";
 import { resolveProfile } from "./response-profiles.js";
 import { GEOMETRY_KEYS, geometryToCentroid, shapeItem } from "./shape-response.js";
 
@@ -31,6 +31,7 @@ const MAX_RESPONSE_BYTES = 200_000;
 
 const AGGREGATE_PARAMS = new Set(["groupBy", "sum", "avg", "count", "limit", "filter"]);
 const GEO_PARAMS = new Set(["nearLat", "nearLon", "radiusMeters"]);
+const GEO_OP_PARAMS = new Set(["geoOp", "geoLat", "geoLon"]);
 
 function stripGeometry(value: unknown): unknown {
   if (Array.isArray(value)) return value.map(stripGeometry);
@@ -141,13 +142,19 @@ function toMcpToolSpec(tool: ToolDef, executeTool: ToolExecutor): RegisteredTool
 
         const aggregateArgs: Record<string, unknown> = {};
         const geoArgs: Record<string, unknown> = {};
+        const geoOpArgs: Record<string, unknown> = {};
         const apiFilters: Record<string, unknown> = {};
 
         for (const [key, val] of Object.entries(restArgs)) {
           if (AGGREGATE_PARAMS.has(key)) aggregateArgs[key] = val;
           else if (GEO_PARAMS.has(key)) geoArgs[key] = val;
+          else if (GEO_OP_PARAMS.has(key)) geoOpArgs[key] = val;
           else apiFilters[key] = val;
         }
+
+        const geoOp = geoOpArgs.geoOp as GeoOp | undefined;
+        const geoLat = geoOpArgs.geoLat as number | undefined;
+        const geoLon = geoOpArgs.geoLon as number | undefined;
 
         // Geo → geo[intersects]
         const geoFilter: Record<string, unknown> = {};
@@ -187,9 +194,22 @@ function toMcpToolSpec(tool: ToolDef, executeTool: ToolExecutor): RegisteredTool
           filter: mergedFilter,
         });
 
-        // Strip geometry from aggregate results to keep response small
-        const stripped = stripGeometry(result);
-        return JSON.stringify(stripped, null, 2);
+        // Verwerk geometry: altijd strippen, optioneel geoOp toepassen
+        const raw = result as Record<string, unknown>[];
+        const processed = raw.map(item => {
+          const stripped = stripGeometry(item) as Record<string, unknown>;
+          if (geoOp) {
+            const opResult = applyGeoOp(
+              item,
+              geoOp,
+              geoLat,
+              geoLon,
+            );
+            return { ...stripped, ...opResult };
+          }
+          return stripped;
+        });
+        return JSON.stringify(processed, null, 2);
       }
 
       // Get tools use original handler

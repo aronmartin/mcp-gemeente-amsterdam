@@ -89,6 +89,180 @@ export function applyNearFilter<T extends Record<string, unknown>>(
   return { ...page, _embedded: filtered };
 }
 
+// ─── GeoOp: server-side geometry transform ───────────────────────────────────
+
+export type GeoOp = "centroid" | "area" | "contains" | "distance_to_edge" | "bbox";
+
+export type GeoOpResult = {
+  _lat?: number;
+  _lon?: number;
+  _area_m2?: number;
+  _contains?: boolean;
+  _distance_to_edge_m?: number;
+  _bbox?: [number, number, number, number]; // [minLon, minLat, maxLon, maxLat]
+};
+
+const GEOMETRY_KEYS_LOCAL = new Set([
+  "geometrie", "geometry", "_geometry", "geoPoint", "geoMultiPoint",
+]);
+
+/** Extract de eerste ring van een Polygon of MultiPolygon geometry als [x, y][] */
+function extractRing(geom: unknown): number[][] | null {
+  if (!geom || typeof geom !== "object") return null;
+  const g = geom as { type?: string; coordinates?: unknown };
+  if (g.type === "Polygon") {
+    const ring = (g.coordinates as number[][][])?.[0];
+    return ring?.length ? ring : null;
+  }
+  if (g.type === "MultiPolygon") {
+    const ring = (g.coordinates as number[][][][])?.[0]?.[0];
+    return ring?.length ? ring : null;
+  }
+  return null;
+}
+
+/** Haal de geometry op uit een API item via bekende keys */
+function extractGeometry(item: Record<string, unknown>): unknown {
+  for (const key of GEOMETRY_KEYS_LOCAL) {
+    if (key in item) return item[key];
+  }
+  return null;
+}
+
+/** Shoelace formule voor polygoon-oppervlakte in geprojecteerde eenheden² */
+function shoelaceArea(ring: number[][]): number {
+  let area = 0;
+  const n = ring.length;
+  for (let i = 0; i < n; i++) {
+    const j = (i + 1) % n;
+    area += ring[i][0] * ring[j][1];
+    area -= ring[j][0] * ring[i][1];
+  }
+  return Math.abs(area) / 2;
+}
+
+/** Punt-in-polygoon via ray casting */
+function pointInPolygon(lat: number, lon: number, ring: number[][], isRd: boolean): boolean {
+  // Converteer punt naar zelfde coördinatenstelsel als ring
+  const [px, py] = isRd ? wgs84ToRd(lat, lon) : [lon, lat];
+  let inside = false;
+  const n = ring.length;
+  for (let i = 0, j = n - 1; i < n; j = i++) {
+    const xi = ring[i][0], yi = ring[i][1];
+    const xj = ring[j][0], yj = ring[j][1];
+    if ((yi > py) !== (yj > py) && px < ((xj - xi) * (py - yi)) / (yj - yi) + xi) {
+      inside = !inside;
+    }
+  }
+  return inside;
+}
+
+/** Minimale afstand van punt tot alle segmenten van de ring (haversine benadering via segment-middelpunt) */
+function minDistanceToEdge(lat: number, lon: number, ring: number[][], isRd: boolean): number {
+  let minDist = Infinity;
+  const n = ring.length;
+  for (let i = 0, j = n - 1; i < n; j = i++) {
+    const xi = ring[i][0], yi = ring[i][1];
+    const xj = ring[j][0], yj = ring[j][1];
+    const midX = (xi + xj) / 2;
+    const midY = (yi + yj) / 2;
+    const { lat: midLat, lon: midLon } = isRd
+      ? rdToWgs84(midX, midY)
+      : { lat: midY, lon: midX };
+    const dist = haversineMeters(lat, lon, midLat, midLon);
+    if (dist < minDist) minDist = dist;
+  }
+  return minDist;
+}
+
+/**
+ * Voer een geometry-operatie uit op een raw API item.
+ * Werkt op het originele item (vóór stripGeometry) zodat geometry beschikbaar is.
+ */
+export function applyGeoOp(
+  item: Record<string, unknown>,
+  op: GeoOp,
+  geoLat?: number,
+  geoLon?: number,
+): GeoOpResult {
+  if (op === "centroid") {
+    const geom = extractGeometry(item);
+    const centroid = geomToCentroid(geom);
+    if (!centroid) return {};
+    return { _lat: centroid.lat, _lon: centroid.lon };
+  }
+
+  if (op === "bbox") {
+    const geom = extractGeometry(item);
+    if (!geom || typeof geom !== "object") return {};
+    const g = geom as { type?: string; coordinates?: unknown };
+    let allCoords: number[][] = [];
+    if (g.type === "Polygon") {
+      allCoords = (g.coordinates as number[][][])?.[0] ?? [];
+    } else if (g.type === "MultiPolygon") {
+      for (const poly of (g.coordinates as number[][][][]) ?? []) {
+        for (const ring of poly ?? []) {
+          allCoords = allCoords.concat(ring);
+        }
+      }
+    } else if (g.type === "LineString") {
+      allCoords = g.coordinates as number[][];
+    } else if (g.type === "Point") {
+      allCoords = [g.coordinates as number[]];
+    }
+    if (!allCoords.length) return {};
+    const isRd = allCoords[0][0] > 1000;
+    const wgsCoords = isRd
+      ? allCoords.map(c => { const w = rdToWgs84(c[0], c[1]); return [w.lon, w.lat]; })
+      : allCoords.map(c => [c[0], c[1]]);
+    const minLon = Math.min(...wgsCoords.map(c => c[0]));
+    const maxLon = Math.max(...wgsCoords.map(c => c[0]));
+    const minLat = Math.min(...wgsCoords.map(c => c[1]));
+    const maxLat = Math.max(...wgsCoords.map(c => c[1]));
+    return { _bbox: [
+      Math.round(minLon * 1e6) / 1e6,
+      Math.round(minLat * 1e6) / 1e6,
+      Math.round(maxLon * 1e6) / 1e6,
+      Math.round(maxLat * 1e6) / 1e6,
+    ] };
+  }
+
+  // area, contains, distance_to_edge — werken op ring
+  const geom = extractGeometry(item);
+  const ring = extractRing(geom);
+  if (!ring || !ring.length) return {};
+
+  const isRd = ring[0][0] > 1000;
+
+  if (op === "area") {
+    let area: number;
+    if (isRd) {
+      // RD is metrisch stelsel — Shoelace geeft m² direct
+      area = shoelaceArea(ring);
+    } else {
+      // WGS84 — schakel om naar meters via lat/lon schaling
+      const refLat = ring.reduce((s, c) => s + c[1], 0) / ring.length;
+      const metersPerLon = METERS_PER_LON_DEG * Math.cos((refLat * Math.PI) / 180);
+      const scaled = ring.map(c => [c[0] * metersPerLon, c[1] * METERS_PER_LAT_DEG]);
+      area = shoelaceArea(scaled);
+    }
+    return { _area_m2: Math.round(area) };
+  }
+
+  if (op === "contains") {
+    if (geoLat === undefined || geoLon === undefined) return {};
+    return { _contains: pointInPolygon(geoLat, geoLon, ring, isRd) };
+  }
+
+  if (op === "distance_to_edge") {
+    if (geoLat === undefined || geoLon === undefined) return {};
+    const dist = minDistanceToEdge(geoLat, geoLon, ring, isRd);
+    return { _distance_to_edge_m: Math.round(dist) };
+  }
+
+  return {};
+}
+
 export const nearRadiusProps = {
   nearLat: { type: "number", description: "WGS84 latitude van het zoekpunt. Gebruik samen met nearLon + radiusMeters voor locatievragen — dit stuurt een server-side bbox-filter naar de API waardoor alleen relevante items worden opgehaald. Veel efficiënter dan ongefilterde paginatie." },
   nearLon: { type: "number", description: "WGS84 longitude van het zoekpunt. Vereist samen met nearLat." },
