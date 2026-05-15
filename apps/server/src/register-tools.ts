@@ -209,7 +209,22 @@ function toMcpToolSpec(tool: ToolDef, executeTool: ToolExecutor): RegisteredTool
           }
           return stripped;
         });
-        return JSON.stringify(processed, null, 2);
+
+        // Profiel-filtering + size-check (zelfde als formatResult voor GET-tools)
+        const profile = resolveProfile(tool.name, (detail as "minimal" | "default" | "full") ?? "default");
+        const extraFields = new Set(
+          fields ? String(fields).split(",").map(s => s.trim()).filter(Boolean) : [],
+        );
+        const shaped = processed.map(item => shapeItem(item, profile, extraFields));
+        const json = JSON.stringify(shaped, null, 2);
+        if (json.length > MAX_RESPONSE_BYTES) {
+          return JSON.stringify({
+            items: shaped.slice(0, 10),
+            truncated: true,
+            note: `Response te groot (${json.length} bytes). Gebruik een kleinere limit of filters.`,
+          }, null, 2);
+        }
+        return json;
       }
 
       // Get tools use original handler
