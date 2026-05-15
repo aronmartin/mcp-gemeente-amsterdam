@@ -123,10 +123,61 @@ export type AggregateParams = {
   limit?: number;
 };
 
+async function runWithConcurrency<T>(
+  tasks: (() => Promise<T>)[],
+  concurrency: number
+): Promise<T[]> {
+  const results: T[] = [];
+  for (let i = 0; i < tasks.length; i += concurrency) {
+    const batch = tasks.slice(i, i + concurrency);
+    const batchResults = await Promise.all(batch.map((fn) => fn()));
+    results.push(...batchResults);
+  }
+  return results;
+}
+
+type PageResult = {
+  _embedded?: Record<string, unknown[]>;
+  _links?: { next?: { href?: string } };
+  page?: { totalPages?: number };
+};
+
+function processPage(result: PageResult, acc: Map<string, GroupAcc>, params: AggregateParams): void {
+  const items = Object.values(result._embedded ?? {}).flat() as Record<string, unknown>[];
+
+  for (const item of items) {
+    const groupKey = params.groupBy ? String(item[params.groupBy] ?? "__null__") : "__all__";
+
+    if (!acc.has(groupKey)) {
+      acc.set(groupKey, { count: 0, sums: {}, avgSums: {}, avgCounts: {} });
+    }
+    const entry = acc.get(groupKey)!;
+    entry.count++;
+
+    for (const field of params.sum ?? []) {
+      const val = Number(item[field]);
+      if (!isNaN(val)) entry.sums[field] = (entry.sums[field] ?? 0) + val;
+    }
+
+    for (const field of params.avg ?? []) {
+      const val = Number(item[field]);
+      if (!isNaN(val)) {
+        entry.avgSums[field] = (entry.avgSums[field] ?? 0) + val;
+        entry.avgCounts[field] = (entry.avgCounts[field] ?? 0) + 1;
+      }
+    }
+  }
+}
+
 export async function aggregate(params: AggregateParams): Promise<Record<string, unknown>[]> {
   const { dataset, collection } = parseEndpoint(params.endpoint);
 
-  const hasReduceParams = params.groupBy || (params.sum?.length ?? 0) > 0 || (params.avg?.length ?? 0) > 0 || params.count;
+  const PAGE_SIZE = 1000;
+  const MAX_PAGES = 500;
+  const CONCURRENCY = 10;
+
+  const hasReduceParams =
+    params.groupBy || (params.sum?.length ?? 0) > 0 || (params.avg?.length ?? 0) > 0 || params.count;
 
   // Limit-only mode: return raw items without aggregation
   if (params.limit !== undefined && !hasReduceParams) {
@@ -140,43 +191,50 @@ export async function aggregate(params: AggregateParams): Promise<Record<string,
   }
 
   const acc = new Map<string, GroupAcc>();
-  let page = 1;
-  let hasMore = true;
 
-  while (hasMore && page <= 500) {
-    const result = await client.list<Record<string, unknown>>(dataset, collection, {
-      ...(params.filter ?? {}),
-      page,
-      page_size: 500,
-    });
+  // Pagina 1 ophalen
+  const firstResult = await client.list<Record<string, unknown>>(dataset, collection, {
+    ...(params.filter ?? {}),
+    page: 1,
+    page_size: PAGE_SIZE,
+  });
 
-    const items = Object.values(result._embedded ?? {}).flat() as Record<string, unknown>[];
+  processPage(firstResult as PageResult, acc, params);
 
-    for (const item of items) {
-      const groupKey = params.groupBy ? String(item[params.groupBy] ?? "__null__") : "__all__";
+  const totalPages = (firstResult as PageResult).page?.totalPages ?? null;
 
-      if (!acc.has(groupKey)) {
-        acc.set(groupKey, { count: 0, sums: {}, avgSums: {}, avgCounts: {} });
-      }
-      const entry = acc.get(groupKey)!;
-      entry.count++;
+  if (totalPages !== null && totalPages > 1) {
+    // Alle overige pagina's parallel ophalen
+    const remainingPages = Array.from(
+      { length: Math.min(totalPages - 1, MAX_PAGES - 1) },
+      (_, i) => i + 2
+    );
 
-      for (const field of params.sum ?? []) {
-        const val = Number(item[field]);
-        if (!isNaN(val)) entry.sums[field] = (entry.sums[field] ?? 0) + val;
-      }
-
-      for (const field of params.avg ?? []) {
-        const val = Number(item[field]);
-        if (!isNaN(val)) {
-          entry.avgSums[field] = (entry.avgSums[field] ?? 0) + val;
-          entry.avgCounts[field] = (entry.avgCounts[field] ?? 0) + 1;
-        }
-      }
+    await runWithConcurrency(
+      remainingPages.map((pageNum) => async () => {
+        const result = await client.list<Record<string, unknown>>(dataset, collection, {
+          ...(params.filter ?? {}),
+          page: pageNum,
+          page_size: PAGE_SIZE,
+        });
+        processPage(result as PageResult, acc, params);
+      }),
+      CONCURRENCY
+    );
+  } else if (totalPages === null) {
+    // Fallback: geen totalPages bekend, sequentieel met next links
+    let hasMore = !!(firstResult as PageResult)._links?.next?.href;
+    let page = 2;
+    while (hasMore && page <= MAX_PAGES) {
+      const result = await client.list<Record<string, unknown>>(dataset, collection, {
+        ...(params.filter ?? {}),
+        page,
+        page_size: PAGE_SIZE,
+      });
+      processPage(result as PageResult, acc, params);
+      hasMore = !!(result as PageResult)._links?.next?.href;
+      page++;
     }
-
-    hasMore = !!result._links?.next?.href;
-    page++;
   }
 
   const rows: Record<string, unknown>[] = [];
