@@ -1,6 +1,6 @@
 {
   "name": "@amsterdam-mcp/server",
-  "version": "1.3.2",
+  "version": "1.4.0",
   "description": "MCP server voor de publieke APIs van Gemeente Amsterdam",
   "private": true,
   "type": "module",
