@@ -23,10 +23,34 @@ import { aggregatieToolDefinitions, handleAggregatieTool } from "@amsterdam-mcp/
 import { buildZodSchema } from "./json-schema-to-zod.js";
 import type { JsonSchemaProp } from "./types.js";
 import type { ToolDef, DsoPage } from "@amsterdam-mcp/core";
+import { buildIntersectsParam } from "@amsterdam-mcp/core";
 import { resolveProfile } from "./response-profiles.js";
 import { GEOMETRY_KEYS, geometryToCentroid, shapeItem } from "./shape-response.js";
 
 const MAX_RESPONSE_BYTES = 200_000;
+
+const AGGREGATE_PARAMS = new Set(["groupBy", "sum", "avg", "count", "limit", "filter"]);
+const GEO_PARAMS = new Set(["nearLat", "nearLon", "radiusMeters"]);
+
+function stripGeometry(value: unknown): unknown {
+  if (Array.isArray(value)) return value.map(stripGeometry);
+  if (value !== null && typeof value === "object") {
+    const obj = value as Record<string, unknown>;
+    const result: Record<string, unknown> = {};
+    for (const [k, v] of Object.entries(obj)) {
+      if (GEOMETRY_KEYS.has(k)) {
+        const centroid = geometryToCentroid(v);
+        if (centroid) result["_centroid"] = centroid;
+      } else if (k === "coordinates" && Array.isArray(v)) {
+        // bare coordinates array — skip (geometry already handled via parent)
+      } else {
+        result[k] = stripGeometry(v);
+      }
+    }
+    return result;
+  }
+  return value;
+}
 
 function processValue(value: unknown): unknown {
   if (Array.isArray(value)) return value.map(processValue);
@@ -113,28 +137,59 @@ function toMcpToolSpec(tool: ToolDef, executeTool: ToolExecutor): RegisteredTool
     execute: async (args) => {
       // List tools (have endpoint) route via aggregate
       if (tool.endpoint) {
-        const { detail, fields, groupBy, sum, avg, count, filter, limit, ...domainFilters } = args;
+        const { detail, fields, ...restArgs } = args;
 
-        const hasAggregateParams = groupBy || (Array.isArray(sum) && sum.length) ||
-                                    (Array.isArray(avg) && avg.length) || count;
-        const effectiveLimit = hasAggregateParams ? undefined : (typeof limit === "number" ? limit : 25);
+        const aggregateArgs: Record<string, unknown> = {};
+        const geoArgs: Record<string, unknown> = {};
+        const apiFilters: Record<string, unknown> = {};
 
+        for (const [key, val] of Object.entries(restArgs)) {
+          if (AGGREGATE_PARAMS.has(key)) aggregateArgs[key] = val;
+          else if (GEO_PARAMS.has(key)) geoArgs[key] = val;
+          else apiFilters[key] = val;
+        }
+
+        // Geo → geo[intersects]
+        const geoFilter: Record<string, unknown> = {};
+        if (geoArgs.nearLat && geoArgs.nearLon) {
+          const radius = (geoArgs.radiusMeters as number) ?? 500;
+          geoFilter["geo[intersects]"] = buildIntersectsParam(
+            geoArgs.nearLat as number,
+            geoArgs.nearLon as number,
+            radius,
+          );
+        }
+
+        const hasAggregateParams = aggregateArgs.groupBy ||
+          (Array.isArray(aggregateArgs.sum) && aggregateArgs.sum.length) ||
+          (Array.isArray(aggregateArgs.avg) && aggregateArgs.avg.length) ||
+          aggregateArgs.count;
+        const effectiveLimit = hasAggregateParams
+          ? undefined
+          : (typeof aggregateArgs.limit === "number" ? aggregateArgs.limit : 25);
+
+        // Merge: apiFilters as base, geoFilter always added, explicit filter object wins
         const mergedFilter = {
-          ...domainFilters,
-          ...(filter && typeof filter === "object" ? filter as Record<string, unknown> : {}),
+          ...apiFilters,
+          ...geoFilter,
+          ...(aggregateArgs.filter && typeof aggregateArgs.filter === "object"
+            ? aggregateArgs.filter as Record<string, unknown>
+            : {}),
         };
 
         const result = await handleAggregatieTool("ams_aggregate", {
           endpoint: tool.endpoint,
-          groupBy,
-          sum,
-          avg,
-          count,
+          groupBy: aggregateArgs.groupBy,
+          sum: aggregateArgs.sum,
+          avg: aggregateArgs.avg,
+          count: aggregateArgs.count,
           limit: effectiveLimit,
           filter: mergedFilter,
         });
 
-        return JSON.stringify(result, null, 2);
+        // Strip geometry from aggregate results to keep response small
+        const stripped = stripGeometry(result);
+        return JSON.stringify(stripped, null, 2);
       }
 
       // Get tools use original handler
