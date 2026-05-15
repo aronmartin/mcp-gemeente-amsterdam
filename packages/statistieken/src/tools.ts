@@ -1,9 +1,11 @@
 import { listTool, type ToolDef } from "@amsterdam-mcp/core";
+import { ENDPOINT_SCHEMAS } from "@amsterdam-mcp/aggregatie";
 
 export const statistiekenToolDefinitions: readonly ToolDef[] = [
   listTool({
     name: "ams_bbga_list",
     endpoint: "bbga/kerncijfers",
+    schema: ENDPOINT_SCHEMAS["bbga/kerncijfers"],
     description: "Geeft BBGA-kerncijfers terug: Basisbestand Gebieden Amsterdam met statistieken per wijk/buurt.",
     extraProps: {
       gebiedcode15: { type: "string", description: "Gebiedscode (buurt- of wijkcode, 15 tekens)" },
@@ -13,6 +15,7 @@ export const statistiekenToolDefinitions: readonly ToolDef[] = [
   listTool({
     name: "ams_statistieken_list",
     endpoint: "statistieken/cijfers",
+    schema: ENDPOINT_SCHEMAS["statistieken/cijfers"],
     description: "Geeft gemeentelijke statistieken terug op indicator of dimensie.",
     extraProps: {
       indicator: { type: "string", description: "Naam van de indicator" },
@@ -25,6 +28,7 @@ export const statistiekenToolDefinitions: readonly ToolDef[] = [
   listTool({
     name: "ams_indicatoren_list",
     endpoint: "indicatoren/buurt",
+    schema: ENDPOINT_SCHEMAS["indicatoren/buurt"],
     description: "Geeft beschikbare indicatoren terug met eenheid, thema en bron, per buurt/wijk/stadsdeel.",
     extraProps: {
       gbdBuurtNaam: { type: "string", description: "Naam van de buurt" },

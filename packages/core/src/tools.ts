@@ -17,17 +17,55 @@ export type ToolDef = {
   };
 };
 
+export type EndpointSchemaRef = {
+  fields: Record<string, string>;
+  numeric_fields: string[];
+};
+
+/** Formatteert een schema als compacte tekst voor tool descriptions */
+function formatSchemaDescription(schema: EndpointSchemaRef): string {
+  const fieldParts: string[] = [];
+  for (const [name, type] of Object.entries(schema.fields)) {
+    fieldParts.push(`${name} (${type})`);
+  }
+
+  // Splits in regels van max ~120 chars
+  const lines: string[] = [];
+  let currentLine = "";
+  for (const part of fieldParts) {
+    const sep = currentLine ? ", " : "";
+    if (currentLine && (currentLine + sep + part).length > 120) {
+      lines.push(currentLine);
+      currentLine = part;
+    } else {
+      currentLine += sep + part;
+    }
+  }
+  if (currentLine) lines.push(currentLine);
+
+  const result = [`\n\nBeschikbare velden: ${lines.join(",\n")}`];
+  if (schema.numeric_fields.length > 0) {
+    result.push(`Numerieke velden (sum/avg): ${schema.numeric_fields.join(", ")}`);
+  }
+  return result.join("\n");
+}
+
 /** Bouw een standaard list-tool definitie voor een DSO collectie */
 export function listTool(opts: {
   name: string;
   description: string;
   endpoint?: string;
+  schema?: EndpointSchemaRef;
   extraProps?: Record<string, PropSchema>;
   required?: readonly string[];
 }): ToolDef {
+  const description = opts.schema
+    ? opts.description + formatSchemaDescription(opts.schema)
+    : opts.description;
+
   return {
     name: opts.name,
-    description: opts.description,
+    description,
     endpoint: opts.endpoint,
     parameters: {
       type: "object",

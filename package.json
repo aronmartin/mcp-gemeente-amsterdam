@@ -10,6 +10,7 @@
     "bundle": "ncc build apps/server/dist/index.js -o dist/ncc -q",
     "mcpb": "pnpm build && pnpm bundle && mcpb pack",
     "test": "turbo test",
+    "generate-schemas": "tsx scripts/generate-schemas.ts",
     "filter-probe": "turbo build --filter=@amsterdam-mcp/filter-probe && node apps/filter-probe/dist/index.js",
     "prepare": "git config core.hooksPath .githooks"
   },
@@ -17,6 +18,7 @@
     "@anthropic-ai/mcpb": "latest",
     "@vercel/ncc": "^0.38.0",
     "esbuild": "^0.25.0",
+    "tsx": "^4.0.0",
     "turbo": "^2.3.3",
     "typescript": "^5.7.3"
   },

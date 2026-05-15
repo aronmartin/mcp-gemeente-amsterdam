@@ -1,9 +1,11 @@
 import { listTool, getTool, type ToolDef } from "@amsterdam-mcp/core";
+import { ENDPOINT_SCHEMAS } from "@amsterdam-mcp/aggregatie";
 
 export const groenToolDefinitions: readonly ToolDef[] = [
   listTool({
     name: "ams_bomen_list",
     endpoint: "bomen/stamgegevens",
+    schema: ENDPOINT_SCHEMAS["bomen/stamgegevens"],
     description: [
       "Zoek bomen in Amsterdam op soort, buurt of aanlegjaar.",
       "Voor buurt-filtering: gebruik eerst ams_resolve_location met het adres om buurt.identificatie te verkrijgen, filter dan op gbdBuurt.identificatie.",
@@ -28,6 +30,7 @@ export const groenToolDefinitions: readonly ToolDef[] = [
   listTool({
     name: "ams_ecologie_list",
     endpoint: "ecologie/kerngebieden",
+    schema: ENDPOINT_SCHEMAS["ecologie/kerngebieden"],
     description: "Geeft ecologische kerngebieden en zones terug (bijv. ecologische verbindingszones).",
     extraProps: {
       categorieKerngebied: { type: "string", description: "Categorie kerngebied" },
@@ -38,6 +41,7 @@ export const groenToolDefinitions: readonly ToolDef[] = [
   listTool({
     name: "ams_ziekte_plagen_exoten_list",
     endpoint: "ziekte_plagen_exoten_groen/eikenprocessierups",
+    schema: ENDPOINT_SCHEMAS["ziekte_plagen_exoten_groen/eikenprocessierups"],
     description: [
       "Geeft meldingen van eikenprocessierups en andere ziekten, plagen en exoten terug.",
       "Voor buurt-filtering: gebruik eerst ams_resolve_location met het adres om buurt.identificatie te verkrijgen, filter dan op gbdBuurt.identificatie.",
@@ -51,6 +55,7 @@ export const groenToolDefinitions: readonly ToolDef[] = [
   listTool({
     name: "ams_functionele_gebieden_list",
     endpoint: "functionele_gebieden/groen",
+    schema: ENDPOINT_SCHEMAS["functionele_gebieden/groen"],
     description: "Geeft functionele groengebieden terug (parken, sportterreinen, begraafplaatsen, etc.).",
     extraProps: {
       naam: { type: "string", description: "Naam van het gebied" },

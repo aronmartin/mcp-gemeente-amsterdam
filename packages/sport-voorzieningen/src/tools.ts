@@ -1,9 +1,11 @@
 import { listTool, type ToolDef } from "@amsterdam-mcp/core";
+import { ENDPOINT_SCHEMAS } from "@amsterdam-mcp/aggregatie";
 
 export const sportVoorzieningenToolDefinitions: readonly ToolDef[] = [
   listTool({
     name: "ams_sport_list",
     endpoint: "sport/openbaresportplek",
+    schema: ENDPOINT_SCHEMAS["sport/openbaresportplek"],
     description: "Geeft openbare sportplekken terug (sportparken, zwembaden, sportscholen, etc.) op type.",
     extraProps: {
       naam: { type: "string", description: "Naam van de sportplek" },
@@ -15,6 +17,7 @@ export const sportVoorzieningenToolDefinitions: readonly ToolDef[] = [
   listTool({
     name: "ams_maatschappelijke_voorzieningen_list",
     endpoint: "maatschappelijke_voorzieningen/voorziening_individueel",
+    schema: ENDPOINT_SCHEMAS["maatschappelijke_voorzieningen/voorziening_individueel"],
     description: "Geeft maatschappelijke voorzieningen terug (ziekenhuizen, bibliotheken, buurthuizen, etc.).",
     extraProps: {
       naam: { type: "string", description: "Naam van de voorziening" },
@@ -25,6 +28,7 @@ export const sportVoorzieningenToolDefinitions: readonly ToolDef[] = [
   listTool({
     name: "ams_schoolgebouwen_list",
     endpoint: "schoolgebouwen/accommodatie",
+    schema: ENDPOINT_SCHEMAS["schoolgebouwen/accommodatie"],
     description: "Geeft schoolgebouwen terug met adres en BRIN-nummer.",
     extraProps: {
       adresStraat: { type: "string", description: "Straatnaam" },
@@ -35,6 +39,7 @@ export const sportVoorzieningenToolDefinitions: readonly ToolDef[] = [
   listTool({
     name: "ams_primair_onderwijs_loopafstanden_list",
     endpoint: "primair_onderwijs_loopafstanden/afstanden",
+    schema: ENDPOINT_SCHEMAS["primair_onderwijs_loopafstanden/afstanden"],
     description: "Geeft loopafstanden tot basisscholen per buurt terug (bereikbaarheidsdata).",
     extraProps: {},
   }),

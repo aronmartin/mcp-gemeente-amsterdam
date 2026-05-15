@@ -1,9 +1,11 @@
 import { listTool, getTool, type ToolDef, nearRadiusProps } from "@amsterdam-mcp/core";
+import { ENDPOINT_SCHEMAS } from "@amsterdam-mcp/aggregatie";
 
 export const openbareRuimteToolDefinitions: readonly ToolDef[] = [
   listTool({
     name: "ams_bgt_list",
     endpoint: "bgt/wegdelen",
+    schema: ENDPOINT_SCHEMAS["bgt/wegdelen"],
     description: "Geeft BGT-wegdelen (Basisregistratie Grootschalige Topografie) terug op type.",
     extraProps: {
       bgtFunctie: { type: "string", description: "BGT-functie van het wegdeel" },
@@ -14,6 +16,7 @@ export const openbareRuimteToolDefinitions: readonly ToolDef[] = [
   listTool({
     name: "ams_nap_peilmerken_list",
     endpoint: "nap/peilmerken",
+    schema: ENDPOINT_SCHEMAS["nap/peilmerken"],
     description: "Geeft NAP-peilmerken terug: officiële hoogtemeetpunten ten opzichte van NAP.",
     extraProps: {
       merkCode: { type: "string", description: "Code van het peilmerk" },
@@ -23,6 +26,7 @@ export const openbareRuimteToolDefinitions: readonly ToolDef[] = [
   listTool({
     name: "ams_meetbouten_list",
     endpoint: "meetbouten/meetbouten",
+    schema: ENDPOINT_SCHEMAS["meetbouten/meetbouten"],
     description: [
       "Geeft meetbouten terug: bouts in de grond voor zakking-monitoring van de bodem.",
       "Gebruik nearLat+nearLon+radiusMeters om meetbouten bij een specifiek adres te vinden (sorteert op afstand).",
@@ -41,6 +45,7 @@ export const openbareRuimteToolDefinitions: readonly ToolDef[] = [
   listTool({
     name: "ams_civieleconstructies_list",
     endpoint: "civieleconstructies/kademuur",
+    schema: ENDPOINT_SCHEMAS["civieleconstructies/kademuur"],
     description: [
       "Geeft kademuren terug uit de civiele constructies registratie.",
       "Gebruik nearLat+nearLon+radiusMeters om kademuren bij een specifiek grachtenpand te vinden (sorteert op afstand).",
@@ -55,6 +60,7 @@ export const openbareRuimteToolDefinitions: readonly ToolDef[] = [
   listTool({
     name: "ams_bouwstroompunten_list",
     endpoint: "bouwstroompunten/bouwstroompunten",
+    schema: ENDPOINT_SCHEMAS["bouwstroompunten/bouwstroompunten"],
     description: "Geeft bouwstroompunten terug: aansluitpunten voor tijdelijke stroomafname bij bouwprojecten.",
     extraProps: {
       primaireFunctie: { type: "string", description: "Primaire functie van het bouwstroompunt" },
@@ -64,6 +70,7 @@ export const openbareRuimteToolDefinitions: readonly ToolDef[] = [
   listTool({
     name: "ams_objecten_openbare_ruimte_list",
     endpoint: "objectenopenbareruimte/afvalbakken",
+    schema: ENDPOINT_SCHEMAS["objectenopenbareruimte/afvalbakken"],
     description: "Geeft afvalbakken in de openbare ruimte terug.",
     extraProps: {
       naam: { type: "string", description: "Naam van het object" },

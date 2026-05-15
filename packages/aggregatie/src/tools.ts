@@ -2,26 +2,6 @@ import type { ToolDef } from "@amsterdam-mcp/core";
 
 export const aggregatieToolDefinitions: readonly ToolDef[] = [
   {
-    name: "ams_get_schema",
-    description: [
-      "Geeft het veldschema van een Amsterdam API endpoint terug:",
-      "veldnamen, datatypes en welke velden numeriek zijn (geschikt voor sum/avg).",
-      "Gebruik dit vóór ams_aggregate om te weten welke velden beschikbaar zijn.",
-      "Endpoint formaat: 'dataset' of 'dataset/collection',",
-      "bijv. 'nieuwbouwplannen', 'meldingen', 'bag/verblijfsobjecten'.",
-    ].join(" "),
-    parameters: {
-      type: "object",
-      properties: {
-        endpoint: {
-          type: "string",
-          description: "Endpoint naam, bijv. 'nieuwbouwplannen' of 'bag/verblijfsobjecten'",
-        },
-      },
-      required: ["endpoint"] as const,
-    },
-  },
-  {
     name: "ams_aggregate",
     description: [
       "Haalt een volledige Amsterdam API dataset op en reduceert die server-side naar een compacte samenvatting.",
@@ -45,7 +25,7 @@ export const aggregatieToolDefinitions: readonly ToolDef[] = [
       "  - avg-resultaat is null als alle waarden ontbraken.",
       "  - Resultaat is gesorteerd op groupBy-waarde (alfabetisch).",
       "",
-      "Workflow: roep eerst ams_get_schema aan om veldnamen en numeric_fields te kennen.",
+      "Veldnamen en numeric_fields zijn zichtbaar in de description van elke list-tool.",
       "Endpoint formaat: 'dataset' of 'dataset/collection', bijv. 'nieuwbouwplannen' of 'bag/verblijfsobjecten'.",
       "",
       "Filter-parameter: key-value object met Amsterdam API filterparameters.",
@@ -57,7 +37,7 @@ export const aggregatieToolDefinitions: readonly ToolDef[] = [
       "Combineren: { 'startBouwGepland[gte]': '2025-01-01', stadsdeelNaam: 'Noord' }",
       "",
       "Redeneerpatroon voor tijdsvragen (bijv. 'hoeveel woningen voor 2028 vs na 2035'):",
-      "  1. Welk datumveld bepaalt de periode? → gebruik ams_get_schema",
+      "  1. Welk datumveld bepaalt de periode? → zie 'Beschikbare velden' in de list-tool description",
       "  2. Kan de tool direct op jaar groeperen? Nee → twee aparte calls met filter",
       "     call 1: filter { 'startBouwGepland[lt]': '2028-01-01' }, count=true",
       "     call 2: filter { 'startBouwGepland[gte]': '2036-01-01' }, count=true",

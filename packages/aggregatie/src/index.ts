@@ -1,17 +1,16 @@
-import { getSchema, aggregate } from "./client.js";
+import { aggregate } from "./client.js";
 import { aggregatieToolDefinitions } from "./tools.js";
+import { ENDPOINT_SCHEMAS } from "./generated-schemas.js";
 
-export { aggregatieToolDefinitions };
+export { aggregatieToolDefinitions, ENDPOINT_SCHEMAS };
 export type { SchemaResult, AggregateParams } from "./client.js";
+export type { EndpointSchema } from "./generated-schemas.js";
 
 export async function handleAggregatieTool(
   toolName: string,
   args: Record<string, unknown>
 ): Promise<unknown> {
   switch (toolName) {
-    case "ams_get_schema":
-      return getSchema({ endpoint: args.endpoint as string });
-
     case "ams_aggregate": {
       const { endpoint, groupBy, sum, avg, count, filter, limit, ...legacyFilter } = args;
       // Merge explicit filter object with any legacy extra params voor backwards-compat

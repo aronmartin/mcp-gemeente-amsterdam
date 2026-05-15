@@ -1,9 +1,11 @@
 import { listTool, type ToolDef, nearRadiusProps } from "@amsterdam-mcp/core";
+import { ENDPOINT_SCHEMAS } from "@amsterdam-mcp/aggregatie";
 
 export const bodemToolDefinitions: readonly ToolDef[] = [
   listTool({
     name: "ams_bodemonderzoeken_list",
     endpoint: "bodem/grond",
+    schema: ENDPOINT_SCHEMAS["bodem/grond"],
     description: [
       "Geeft bodemonderzoeken terug. Toont locaties waar bodemonderzoek is gedaan, met verontreinigingsoordeel.",
       "Gebruik nearLat+nearLon+radiusMeters om onderzoeken bij een specifiek adres te vinden.",
@@ -18,24 +20,28 @@ export const bodemToolDefinitions: readonly ToolDef[] = [
   listTool({
     name: "ams_historische_bodeminformatie_list",
     endpoint: "historische_bodeminformatie/onderzoeken",
+    schema: ENDPOINT_SCHEMAS["historische_bodeminformatie/onderzoeken"],
     description: "Geeft historische bedrijfslocaties terug die bodemverontreiniging kunnen hebben veroorzaakt.",
     extraProps: {},
   }),
   listTool({
     name: "ams_explosieven_list",
     endpoint: "explosieven/verdachtgebied",
+    schema: ENDPOINT_SCHEMAS["explosieven/verdachtgebied"],
     description: "Geeft verdachte gebieden terug met risico op niet-gesprongen explosieven (NGE) uit WOII.",
     extraProps: {},
   }),
   listTool({
     name: "ams_ontplofbare_oorlogsresten_list",
     endpoint: "ontplofbare_oorlogsresten/inslagen",
+    schema: ENDPOINT_SCHEMAS["ontplofbare_oorlogsresten/inslagen"],
     description: "Geeft inslaglocaties van ontplofbare oorlogsresten (bommen, granaten) terug.",
     extraProps: {},
   }),
   listTool({
     name: "ams_leidingen_list",
     endpoint: "leidingeninfrastructuur/waternet_rioolleidingen",
+    schema: ENDPOINT_SCHEMAS["leidingeninfrastructuur/waternet_rioolleidingen"],
     description: "Geeft Waternet riool- en leidingeninfrastructuur terug.",
     extraProps: {},
   }),

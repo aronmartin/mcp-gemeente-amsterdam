@@ -1,9 +1,11 @@
 import { listTool, type ToolDef } from "@amsterdam-mcp/core";
+import { ENDPOINT_SCHEMAS } from "@amsterdam-mcp/aggregatie";
 
 export const vergunningenToolDefinitions: readonly ToolDef[] = [
   listTool({
     name: "ams_vergunningen_list",
     endpoint: "vergunningen/omzetting",
+    schema: ENDPOINT_SCHEMAS["vergunningen/omzetting"],
     description: "Zoek omzettingsvergunningen (woningomzetting) op wijk of kleurcategorie.",
     extraProps: {
       wijkNaam: { type: "string", description: "Naam van de wijk" },
@@ -13,6 +15,7 @@ export const vergunningenToolDefinitions: readonly ToolDef[] = [
   listTool({
     name: "ams_evenementen_list",
     endpoint: "evenementen/evenementen",
+    schema: ENDPOINT_SCHEMAS["evenementen/evenementen"],
     description: [
       "Zoek vergunde evenementen in Amsterdam op naam, datum of gebied.",
       "Waarschuwing: de upstream evenementen-feed bevat mogelijk verouderde data (laatste bekende events zijn uit 2021).",
@@ -28,6 +31,7 @@ export const vergunningenToolDefinitions: readonly ToolDef[] = [
   listTool({
     name: "ams_horeca_list",
     endpoint: "horeca/exploitatievergunning",
+    schema: ENDPOINT_SCHEMAS["horeca/exploitatievergunning"],
     description: "Zoek horecabedrijven (cafés, restaurants, hotels) op naam of adres.",
     extraProps: {
       zaaknaam: { type: "string", description: "Naam van het bedrijf" },
@@ -39,6 +43,7 @@ export const vergunningenToolDefinitions: readonly ToolDef[] = [
   listTool({
     name: "ams_biz_list",
     endpoint: "bedrijveninvesteringszones/gebieden",
+    schema: ENDPOINT_SCHEMAS["bedrijveninvesteringszones/gebieden"],
     description: "Geeft Bedrijven Investeringszones (BIZ) terug: samenwerkingsverbanden van ondernemers per gebied.",
     extraProps: {},
   }),
